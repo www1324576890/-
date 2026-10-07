@@ -1,0 +1,1899 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>我的网站</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f4c81'/%3E%3Cpath d='M7 17a9 9 0 0 1 18 0' stroke='white' stroke-width='2.4' fill='none' stroke-linecap='round'/%3E%3Ccircle cx='16' cy='17' r='3.4' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://miaoda.feishu.cn">
+<link href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+/* ===================== 设计系统 ===================== */
+:root{
+  --bg:#ffffff;
+  --surface:#f6f7f9;
+  --surface-2:#eef0f3;
+  --line:#e6e8ec;
+  --ink:#16181d;
+  --muted:#68707d;
+  --accent:#0f4c81;
+  --accent-soft:#e8f0f8;
+  --ok:#1e7d4f;
+  --warn:#b45309;
+  --danger:#b3261e;
+  --radius:14px;
+  --shadow:0 1px 2px rgba(22,24,29,.04), 0 8px 24px rgba(22,24,29,.05);
+  --font:-apple-system,BlinkMacSystemFont,"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:var(--font);
+  background:var(--bg);
+  color:var(--ink);
+  line-height:1.7;
+  font-size:16px;
+}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+input,textarea,select{font-family:inherit;font-size:15px}
+::selection{background:var(--accent);color:#fff}
+
+/* ---------- 顶部栏 ---------- */
+.topbar{
+  position:sticky;top:0;z-index:50;
+  height:56px;background:rgba(255,255,255,.92);
+  backdrop-filter:saturate(1.2) blur(8px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(14px,4vw,26px);
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px}
+.brand svg{flex:none}
+.brand .dot{color:var(--accent)}
+.backlink{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:14px;padding:6px 10px;border-radius:8px;transition:.15s}
+.backlink:hover{background:var(--surface);color:var(--ink)}
+/* 右上角隐藏触发区（管理后台入口）：肉眼几乎不可见，点 5 下触发 */
+.admin-trigger{
+  position:absolute;top:0;right:0;width:44px;height:44px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+.admin-trigger::before{
+  content:"";position:absolute;top:9px;right:10px;width:5px;height:5px;
+  border-radius:50%;background:transparent;opacity:0;
+}
+/* 左上角隐藏触发区（配合右上角，各点 2 下进入纯白界面） */
+.trigger-tl{
+  position:absolute;top:0;left:0;width:44px;height:44px;
+  cursor:pointer;-webkit-tap-highlight-color:transparent;
+}
+
+/* ---------- 视图容器 ---------- */
+main{min-height:calc(100vh - 128px)}
+.view{display:none;max-width:940px;margin:0 auto;padding:34px clamp(16px,4vw,26px) 60px}
+.view.active{display:block;animation:fade .32s ease}
+@keyframes fade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.pagehead{margin-bottom:26px}
+.pagehead .crumb{font-size:13px;color:var(--muted);margin-bottom:8px;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.pagehead .crumb button{color:var(--accent);padding:2px 4px;border-radius:5px}
+.pagehead .crumb button:hover{background:var(--accent-soft)}
+.pagehead h1{font-size:clamp(24px,4vw,32px);font-weight:800;letter-spacing:-.01em}
+.pagehead p.sub{color:var(--muted);font-size:15px;margin-top:6px;max-width:640px}
+.intro-avatar{width:clamp(96px,22vw,132px);height:clamp(96px,22vw,132px);object-fit:cover;border-radius:20px;box-shadow:var(--shadow);border:1px solid var(--line);flex:none}
+
+/* ---------- 首页 ---------- */
+.hero{
+  text-align:center;padding:clamp(40px,9vw,90px) 0 28px;
+}
+.hero .waves{width:70px;margin:0 auto 22px;color:var(--accent)}
+.hero h1{
+  font-size:clamp(34px,7vw,56px);font-weight:900;letter-spacing:-.02em;line-height:1.15;
+}
+.hero h1 .accent{color:var(--accent)}
+.hero .tagline{
+  margin:16px auto 0;max-width:520px;color:var(--muted);font-size:16px;
+}
+.hero .meta{
+  margin-top:22px;display:inline-flex;align-items:center;gap:10px;
+  color:var(--muted);font-size:13px;
+  border:1px solid var(--line);background:var(--surface);
+  padding:6px 14px;border-radius:999px;
+}
+.hero .meta .pulse{width:8px;height:8px;border-radius:50%;background:var(--ok);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(30,125,79,.35)}50%{box-shadow:0 0 0 6px rgba(30,125,79,0)}}
+
+.navgrid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  margin-top:30px;
+}
+.navcard{
+  position:relative;text-align:left;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px;
+  transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  display:flex;flex-direction:column;gap:10px;
+}
+.navcard:hover{transform:translateY(-3px);box-shadow:var(--shadow);border-color:#cdd5de}
+.navcard:active{transform:translateY(-1px)}
+.navcard .ic{
+  width:42px;height:42px;border-radius:11px;
+  background:var(--accent-soft);color:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+}
+.navcard .ic svg{width:22px;height:22px}
+.navcard .t{font-weight:700;font-size:16px}
+.navcard .d{font-size:13.5px;color:var(--muted);line-height:1.6}
+.navcard .go{position:absolute;top:20px;right:18px;color:#b6bdc7}
+.navcard .go svg{width:16px;height:16px}
+/* 提建议板块：整行宽度卡片 */
+.navcard.wide{grid-column:1/-1;display:flex;align-items:center;gap:16px;border-color:#d5e2f3;background:#f7fafd}
+.navcard.wide .ic{width:52px;height:52px}
+.navcard.wide .t{font-size:17px}
+.navcard.wide .go{position:static;margin-left:auto}
+/* 提建议：单选打勾选项 */
+.radios{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}
+.ra{display:inline-flex;align-items:center;gap:9px;padding:9px 15px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-size:14px;cursor:pointer;transition:.15s;-webkit-tap-highlight-color:transparent}
+.ra:hover{border-color:var(--accent);color:var(--accent)}
+.ra .ck{width:18px;height:18px;border-radius:50%;border:1.5px solid #c6ccd4;display:inline-flex;align-items:center;justify-content:center;flex:none;transition:.15s}
+.ra .ck svg{display:none;width:10px;height:10px}
+.ra.on{border-color:var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:600}
+.ra.on .ck{border-color:var(--accent);background:var(--accent)}
+.ra.on .ck svg{display:block}
+.dropzone{border:1.6px dashed #c6ccd4;border-radius:var(--radius);padding:24px 14px;text-align:center;cursor:pointer;transition:.15s;margin-bottom:14px;background:var(--surface);outline:none}
+.dropzone:hover{border-color:var(--accent)}
+.dropzone:focus-visible{border-color:var(--accent)}
+.dropzone.on{border-color:var(--accent);background:rgba(15,76,129,.04)}
+.dz-t{font-size:14.5px;font-weight:700;color:var(--text);margin-top:8px}
+.dz-s{font-size:12px;color:var(--muted);margin-top:4px}
+.sg-cat{font-size:11px;font-weight:600;color:var(--accent);background:var(--accent-soft);padding:1px 7px;border-radius:999px}
+.sg-label{font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px}
+.sg-done{color:var(--ok);font-size:14px;margin-top:12px;text-align:right}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.tab{font-size:13px;padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:var(--surface);color:var(--muted);cursor:pointer}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+.card.center{text-align:center;display:flex;flex-direction:column;align-items:center}
+.wx-badge{width:64px;height:64px;border-radius:18px;background:#07c160;color:#fff;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.wx-badge svg{width:34px;height:34px}
+.wx-label{font-size:13px;color:var(--muted);margin-bottom:8px}
+.wx-id{font-size:26px;font-weight:800;letter-spacing:.05em;color:var(--text);font-family:ui-monospace,Menlo,Consolas,monospace;margin-bottom:18px}
+
+/* ---------- 分区 / 卡片 ---------- */
+.section-tag{font-size:12px;letter-spacing:.08em;color:var(--accent);font-weight:700;margin:34px 0 14px;text-transform:uppercase}
+.grid2{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.card{
+  background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+  padding:20px;transition:.16s;
+}
+.card.tappable{cursor:pointer}
+.card.tappable:hover{border-color:#cdd5de;box-shadow:var(--shadow);transform:translateY(-2px)}
+.card .ic{width:40px;height:40px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.card .ic svg{width:20px;height:20px}
+.card h3{font-size:16px;font-weight:700;margin-bottom:4px}
+.card p{font-size:13.5px;color:var(--muted)}
+
+/* 工具面板 */
+.panel{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:20px;margin-top:8px}
+.panel .row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:14px 0}
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  background:var(--accent);color:#fff;font-weight:600;font-size:14px;
+  padding:9px 16px;border-radius:9px;transition:.15s;
+}
+.btn:hover{background:#0d416d}
+.btn.ghost{background:var(--surface-2);color:var(--ink)}
+.btn.ghost:hover{background:#e2e6eb}
+.btn.danger{background:#fdeceb;color:var(--danger)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn svg{width:15px;height:15px}
+.hint{font-size:12.5px;color:var(--muted);line-height:1.7}
+.status-line{font-size:13.5px;color:var(--muted);min-height:22px;margin-top:4px}
+.status-line b{color:var(--accent);font-weight:600}
+
+/* 表单 */
+.field{margin:10px 0}
+.field label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;color:#3a404a}
+.field input,.field textarea,.field select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:9px;
+  background:#fff;color:var(--ink);outline:none;transition:.15s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(15,76,129,.1)}
+.field textarea{resize:vertical;min-height:74px}
+
+/* 画廊（空态 + 卡片） */
+.gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:6px}
+.entry{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:16px;position:relative}
+.entry .e-t{font-weight:700;font-size:15px;margin-bottom:2px}
+.entry .e-d{font-size:12.5px;color:var(--muted)}
+.entry .e-link{display:inline-block;margin-top:10px;font-size:13px;color:var(--accent);font-weight:600}
+.l-link{display:inline-block;font-size:12.5px;color:var(--accent);font-weight:600}
+.entry .del{position:absolute;top:10px;right:10px;color:#c6ccd5;font-size:15px;line-height:1;padding:3px;border-radius:6px}
+.entry .del:hover{color:var(--danger);background:#fdeceb}
+.empty{
+  grid-column:1/-1;text-align:center;padding:44px 20px;color:var(--muted);
+  border:1px dashed var(--line);border-radius:var(--radius);
+}
+.empty .big{font-size:15px;font-weight:600;color:#4a5160;margin-bottom:4px}
+
+/* ---------- 底部 ---------- */
+footer{border-top:1px solid var(--line);padding:22px;text-align:center;color:var(--muted);font-size:13px}
+footer .foot-brand{font-weight:700;color:var(--ink);margin-bottom:4px}
+
+/* ---------- 隐藏入口：纯白界面 / 登录 / 管理后台 ---------- */
+.overlay{
+  position:fixed;inset:0;z-index:200;display:none;
+  background:var(--bg);
+}
+.overlay.show{display:block}
+/* 纯白界面上方触发层 */
+.whitestage{position:absolute;inset:0}
+.stage-trigger{position:absolute;top:0;right:0;width:64px;height:64px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.whitestage .ws-hint{
+  position:absolute;bottom:70px;left:0;right:0;text-align:center;
+  color:#b7bec7;font-size:14px;letter-spacing:.12em;
+}
+/* 登录弹窗 */
+.login-wrap{position:absolute;inset:0;display:none;align-items:center;justify-content:center;padding:20px}
+.login-wrap.show{display:flex}
+.login-box{width:100%;max-width:360px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:28px;animation:fade .3s ease}
+.login-box .lk{font-size:13px;color:var(--muted);margin-bottom:4px}
+.login-box h2{font-size:21px;font-weight:800;margin-bottom:20px}
+.login-box .err{color:var(--danger);font-size:13px;min-height:20px;margin:8px 0 0}
+/* 管理后台 */
+.admin{position:absolute;inset:0;display:none;flex-direction:column;background:var(--bg)}
+.admin.show{display:flex}
+.admin-top{height:56px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:0 clamp(14px,4vw,24px)}
+.admin-top .at-l{display:flex;align-items:center;gap:10px;font-weight:800;font-size:16px}
+.admin-top .at-l .chip{font-size:11px;font-weight:600;color:var(--ok);background:#e5f4ec;padding:2px 8px;border-radius:999px}
+.admin-top .at-l .chip.normal{color:#8a6d1a;background:#f7efd8}
+.login-note{font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6}
+.adm-row{display:flex;align-items:center;gap:12px;padding:10px 2px;border-bottom:1px solid var(--line)}
+.adm-row:last-child{border-bottom:none}
+.adm-no{width:24px;height:24px;flex:none;border-radius:50%;background:var(--accent-soft);color:var(--accent);font-weight:700;font-size:12px;display:flex;align-items:center;justify-content:center}
+.adm-info{flex:1;min-width:0}
+.adm-u{font-weight:700;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:14px}
+.adm-p{color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px}
+.f-t{color:var(--muted);font-size:12px;font-weight:400}
+.btn.sm{padding:5px 12px;font-size:13px}
+.adm-sec{font-size:13px;font-weight:700;color:var(--muted);letter-spacing:.04em;margin:18px 0 10px;display:flex;align-items:center;gap:8px}
+.adm-sec::after{content:"";flex:1;height:1px;background:var(--line)}
+.adm-inp{box-sizing:border-box;padding:8px 10px;border:1px solid var(--line);border-radius:8px;font-size:14px;font-family:inherit;background:#fff;color:var(--ink)}
+.adm-inp:focus{outline:none;border-color:var(--accent)}
+.adm-edit-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.adm-edit-row .adm-inp{flex:1;min-width:120px}
+.admin-top .at-r{display:flex;gap:8px}
+.admin-body{flex:1;display:grid;grid-template-columns:220px 1fr;overflow:hidden}
+.admin-side{border-right:1px solid var(--line);padding:18px 12px;overflow:auto}
+.admin-side .sec{font-size:12px;color:var(--muted);letter-spacing:.08em;margin:18px 8px 8px}
+.admin-side .mitem{
+  display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border-radius:9px;
+  font-size:14px;color:#3a404a;font-weight:500;
+}
+.admin-side .mitem:hover{background:var(--surface)}
+.admin-side .mitem.on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+.admin-side .mitem svg{width:17px;height:17px}
+.admin-main{overflow:auto;padding:24px clamp(16px,3vw,28px)}
+/* AI 对话 */
+.chat{display:flex;flex-direction:column;height:100%;max-height:calc(100vh - 120px)}
+.chat-head{margin-bottom:14px}
+.chat-head h3{font-size:18px;font-weight:800}
+.chat-head p{font-size:13px;color:var(--muted)}
+.msgbox{flex:1;overflow:auto;display:flex;flex-direction:column;gap:12px;padding:4px 2px 16px}
+.msg{max-width:78%;padding:10px 14px;border-radius:14px;font-size:14.5px;line-height:1.65;white-space:pre-wrap;word-break:break-word;animation:fade .25s ease}
+.msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:4px}
+.msg.bot{align-self:flex-start;background:var(--surface);border-bottom-left-radius:4px}
+.msg .who{display:block;font-size:11px;color:var(--muted);margin-bottom:3px}
+.msg.user .who{color:rgba(255,255,255,.8)}
+.chat-input{display:flex;gap:9px;margin-top:10px}
+.chat-input input{flex:1;padding:11px 14px;border:1px solid var(--line);border-radius:10px;outline:none}
+.chat-input input:focus{border-color:var(--accent)}
+.quick{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.quick button{font-size:12.5px;color:var(--accent);background:var(--accent-soft);padding:5px 11px;border-radius:999px;font-weight:600}
+.quick button:hover{background:#d9e8f5}
+
+/* 小工具：画布与波形 */
+.toolstage{display:flex;flex-direction:column;gap:14px}
+.mini-canvas{
+  width:100%;border:1px solid var(--line);border-radius:12px;background:#fff;
+  image-rendering:pixelated;touch-action:none;
+}
+.draw-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.swatch{width:26px;height:26px;border-radius:7px;cursor:pointer;border:2px solid transparent}
+.swatch.on{border-color:var(--ink)}
+input[type=color]{width:38px;height:32px;border:1px solid var(--line);border-radius:7px;padding:2px;cursor:pointer}
+.seg{display:inline-flex;background:var(--surface-2);border-radius:9px;padding:3px}
+.seg button{font-size:13px;padding:6px 12px;border-radius:7px;color:var(--muted);font-weight:600}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.12)}
+.progress{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:10px}
+.progress i{display:block;height:100%;width:0;background:var(--accent);transition:width .2s}
+
+/* 小游戏 */
+.game-wrap{position:relative;width:100%}
+.game-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+.game-head .score{font-size:14px;font-weight:700}
+.dpad{display:grid;grid-template-columns:repeat(3,44px);gap:6px;justify-content:center;margin-top:12px}
+.dpad button{width:44px;height:44px;background:var(--surface);border:1px solid var(--line);border-radius:10px;font-size:17px;color:var(--ink)}
+.dpad button:active{background:var(--surface-2)}
+
+/* 列表（资源库） */
+.lib-cat{margin-bottom:8px}
+.cat-head{display:flex;align-items:center;gap:8px;font-weight:700;margin:24px 0 10px;font-size:15px}
+.cat-head .cnt{font-size:12px;color:var(--muted);font-weight:500;background:var(--surface);padding:1px 8px;border-radius:999px}
+.listrow{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid var(--line);border-radius:10px;margin-bottom:8px;background:#fff}
+.listrow .l-ic{width:34px;height:34px;border-radius:9px;background:var(--accent-soft);color:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+.listrow .l-ic svg{width:17px;height:17px}
+.listrow .l-b{flex:1;min-width:0}
+.listrow .l-t{font-weight:600;font-size:14px}
+.listrow .l-d{font-size:12.5px;color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.listrow .l-x{color:#c6ccd5;padding:3px 6px;border-radius:6px;font-size:14px}
+.listrow .l-x:hover{color:var(--danger);background:#fdeceb}
+
+/* 提示 toast */
+.toast{
+  position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(20px);
+  background:rgba(22,24,29,.92);color:#fff;font-size:14px;padding:10px 18px;border-radius:10px;
+  opacity:0;pointer-events:none;transition:.25s;z-index:400;max-width:86vw;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+@media (max-width:720px){
+  .navgrid{grid-template-columns:repeat(2,1fr)}
+  .grid2{grid-template-columns:1fr}
+  .gallery{grid-template-columns:repeat(2,1fr)}
+  .admin-body{grid-template-columns:1fr}
+  .admin-side{display:none}
+  .admin-side.mobile-show{display:block;position:absolute;inset:0;z-index:5;background:#fff}
+  .admin-mobile-menu{display:inline-flex}
+}
+@media (max-width:480px){
+  .navgrid{grid-template-columns:1fr}
+  .gallery{grid-template-columns:1fr}
+}
+.admin-mobile-menu{display:none}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <svg width="24" height="24" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0f4c81"/><path d="M7 17a9 9 0 0 1 18 0" stroke="#fff" stroke-width="2.4" fill="none" stroke-linecap="round"/><circle cx="16" cy="17" r="3.4" fill="#fff"/></svg>
+    <span>我的网站<span class="dot">·</span></span>
+  </div>
+  <div class="trigger-tl" id="triggerTl" title=""></div>
+  <div class="admin-trigger" id="adminTrigger" title=""></div>
+</header>
+
+<main id="main">
+  <!-- ===== 视图：首页 ===== -->
+  <section class="view active" id="view-home">
+    <div class="hero">
+      <div class="waves">
+        <svg viewBox="0 0 70 34" fill="none"><path d="M3 17a9 9 0 0 1 18 0M12 17a9 9 0 0 1 18 0M21 17a9 9 0 0 1 18 0M30 17a9 9 0 0 1 18 0M39 17a9 9 0 0 1 18 0M48 17a9 9 0 0 1 18 0" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>
+      </div>
+      <h1>欢迎来到<span class="accent">我的网站</span></h1>
+      <p class="tagline">一个属于我自己的小天地 —— 无线电工具、小游戏、游戏程序和资源库，都在这里。</p>
+      <div class="meta"><span class="pulse"></span><span>个人站点 · 持续更新中</span></div>
+    </div>
+
+    <div class="navgrid">
+      <button class="navcard" data-nav="#/intro">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.6 3.1-5.5 7-5.5s7 1.9 7 5.5"/></svg></span>
+        <span class="t">我的简介</span>
+        <span class="d">关于我的一点介绍</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/radio">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 8.5h8M8 12h5M7 15h2M11 15h2"/><circle cx="17" cy="15" r="1.4"/></svg></span>
+        <span class="t">无线电小工具</span>
+        <span class="d">SSTV 编码、解码等</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/relax">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 3.5a8.5 8.5 0 0 1 0 17"/></svg></span>
+        <span class="t">解压小游戏</span>
+        <span class="d">放松一下，戳一戳</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/killtime">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l16 16M20 4L4 20"/></svg></span>
+        <span class="t">打发时间小游戏</span>
+        <span class="d">贪吃蛇、翻牌等</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/mygames">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="3"/><path d="M8 13v-2M7 12h2M16 12h.01M18.5 13.5h.01"/></svg></span>
+        <span class="t">我做的游戏的程序</span>
+        <span class="d">我自己写的游戏</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/library">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 3v18M16 3v18"/></svg></span>
+        <span class="t">我的资源库</span>
+        <span class="d">收藏的资料与工具</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+      <button class="navcard" data-nav="#/feedback">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4C5.9 4 3 6.6 3 9.8c0 1.8.9 3.4 2.4 4.5l-.5 2.2 2.5-1.1c.5.2 1.1.3 1.7.3"/><path d="M17 10a3 3 0 0 0 0-6c-2.2 0-4 1.7-4 3.8 0 2 1.8 3.7 4 3.7.6 0 1.2-.1 1.7-.3l2 1-.4-1.6c1-.8 1.7-1.9 1.7-3.2"/><path d="M9 9.5h.01M13 9.5h.01"/></svg></span>
+        <span class="t">建议箱</span>
+        <span class="d">我的微信号在这里</span>
+        <span class="go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></span>
+      </button>
+    </div>
+  </section>
+
+  <!-- ===== 视图：建议箱（我的微信号） ===== -->
+  <section class="view" id="view-feedback">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>建议箱</span></div>
+      <h1>建议箱</h1>
+      <p class="sub">想给我建议、或想交流无线电 / 小游戏 / 技术，欢迎加我微信（呼号 BA3MJX）。</p>
+    </div>
+    <div class="card center">
+      <div class="wx-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 4C5.9 4 3 6.6 3 9.8c0 1.8.9 3.4 2.4 4.5l-.5 2.2 2.5-1.1c.5.2 1.1.3 1.7.3"/><path d="M17 10a3 3 0 0 0 0-6c-2.2 0-4 1.7-4 3.8 0 2 1.8 3.7 4 3.7.6 0 1.2-.1 1.7-.3l2 1-.4-1.6c1-.8 1.7-1.9 1.7-3.2"/><path d="M9 9.5h.01M13 9.5h.01"/></svg></div>
+      <div class="wx-label">我的微信号</div>
+      <div class="wx-id">BA3MJX</div>
+      <button class="btn" id="wxCopy">一键复制微信号</button>
+      <div class="hint" style="margin-top:12px">复制后打开微信：右上角 ＋ → 添加朋友 → 搜索并粘贴 → 添加<br>（也可以直接搜索 BA3MJX）</div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：我的简介 ===== -->
+  <section class="view" id="view-intro">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>我的简介</span></div>
+      <h1>我的简介</h1>
+      <p class="sub">关于我的一点自我介绍。</p>
+    </div>
+    <div class="card" style="margin-bottom:14px">
+      <div class="row" style="align-items:center;gap:18px;flex-wrap:wrap">
+        <img class="intro-avatar" src="https://media.doubao.com/space/api/box/stream/download/all_by_mount_point/YI1MbhhrTomVC4xZXwBcZwoInNg" alt="我的 3D 形象">
+        <div style="flex:1;min-width:220px">
+          <h3 style="font-size:20px;margin-bottom:2px">你好，我是小张</h3>
+          <p style="margin-bottom:10px">一名热爱无线电、影像和动手折腾的初中生。</p>
+          <div class="hint">以下是我的主要兴趣方向 ——</div>
+        </div>
+      </div>
+    </div>
+    <div class="grid2">
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M8 8.5h8M8 12h5"/></svg></div><h3>无线电</h3><p>喜欢研究业余无线电、SSTV 图像传输，正在准备无线电 B 类考试。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8c4-3 8 4 12-1s6 2 6 2"/><circle cx="5" cy="16" r="1.6"/><circle cx="12" cy="15" r="1.6"/><circle cx="19" cy="16" r="1.6"/></svg></div><h3>影像</h3><p>喜欢拍视频、研究相机和运动相机，记录生活里的瞬间。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="12" rx="3"/><path d="M8 13v-2M7 12h2M16 12h.01M18.5 13.5h.01"/></svg></div><h3>做游戏</h3><p>喜欢自己动手写小游戏，把想法变成能玩的东西。</p></div>
+      <div class="card"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg></div><h3>折腾技术</h3><p>对刷机、智能家居、各种硬件和小工具都很感兴趣。</p></div>
+    </div>
+    <div class="section-tag">关于这个网站</div>
+    <div class="card">
+      <p style="font-size:14.5px">这里是我整理自己兴趣的地方：无线电小工具（SSTV 编码 / 解码）、平时玩的小游戏、我自己做的游戏程序，还有我收藏的资源库。慢慢会越来越多。</p>
+    </div>
+  </section>
+
+  <!-- ===== 视图：无线电小工具 ===== -->
+  <section class="view" id="view-radio">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>无线电小工具</span></div>
+      <h1>无线电小工具</h1>
+      <p class="sub">和业余无线电相关的小工具，陆续添加中。</p>
+    </div>
+    <div class="grid2">
+      <div class="card tappable" data-nav="#/sstv">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 8c4-3 8 4 12-1s6 2 6 2"/><path d="M5 16h4M5 13h4"/></svg></div>
+        <h3>SSTV 专辑</h3>
+        <p>慢扫描电视 —— 用声音传图片。内含 SSTV 编码与解码。</p>
+      </div>
+      <div class="card">
+        <div class="ic" style="color:var(--muted);background:var(--surface)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="8.5"/></svg></div>
+        <h3>更多工具（筹备中）</h3>
+        <p>后续会加入频点换算、摩尔斯电码等实用小工具。</p>
+      </div>
+    </div>
+    <div class="section-tag" id="radioSubTag" style="display:none">社区无线电资源（审核采纳）</div>
+    <div class="lib-cat" id="radioSub"></div>
+  </section>
+
+  <!-- ===== 视图：SSTV 专辑 ===== -->
+  <section class="view" id="view-sstv">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><button data-nav="#/radio">无线电小工具</button><span>/</span><span>SSTV 专辑</span></div>
+      <h1>SSTV 专辑</h1>
+      <p class="sub">慢扫描电视（Slow-Scan Television），通过音频信号逐行传输图片。现在有两个工具。</p>
+    </div>
+    <div class="grid2">
+      <div class="card tappable" data-nav="#/sstv-decode">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M3 14a3 3 0 0 1 6 0M9 14a3 3 0 0 1 6 0M15 14a3 3 0 0 1 6 0"/><path d="M6 10a6 6 0 0 1 12 0"/></svg></div>
+        <h3>SSTV 解码</h3>
+        <p>把 SSTV 音频解码成图片（支持 Robot 36）。</p>
+      </div>
+      <div class="card tappable" data-nav="#/sstv-encode">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M6 10a6 6 0 0 1 12 0"/><path d="M3 14a3 3 0 0 1 6 0M9 14a3 3 0 0 1 6 0M15 14a3 3 0 0 1 6 0"/></svg></div>
+        <h3>SSTV 编码</h3>
+        <p>把图片编码成 SSTV 音频（Robot 36）。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：SSTV 解码 ===== -->
+  <section class="view" id="view-sstv-decode">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><button data-nav="#/radio">无线电小工具</button><span>/</span><button data-nav="#/sstv">SSTV 专辑</button><span>/</span><span>SSTV 解码</span></div>
+      <h1>SSTV 解码</h1>
+      <p class="sub">把 SSTV 音频解码成图片。支持 Robot 36 格式。可以用麦克风实时解码，也可以直接上传音频文件。</p>
+    </div>
+    <div class="toolstage">
+      <div class="panel">
+        <div class="row" style="margin-top:0">
+          <button class="btn" id="decStart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 3l14 9-14 9z"/></svg>开始解码（麦克风）</button>
+          <button class="btn ghost" id="decStop" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>停止</button>
+          <label class="btn ghost" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg>从文件解码<input type="file" id="decFile" accept="audio/*,video/*,.wav,.mp3,.ogg,.flac" style="display:none"></label>
+        </div>
+        <div class="status-line" id="decStatus">空闲。点击「开始解码」后用麦克风播放 SSTV 音频。</div>
+        <div class="progress" id="decProgress" style="display:none"><i id="decProgressBar"></i></div>
+      </div>
+      <div class="panel">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+          <h3 style="font-size:15px">解码结果</h3>
+          <button class="btn ghost" id="decSave" style="display:none">保存图片</button>
+        </div>
+        <canvas class="mini-canvas" id="decCanvas" width="320" height="240"></canvas>
+        <div class="hint" style="margin-top:8px">Robots 36：320×240，黑白图像。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：SSTV 编码 ===== -->
+  <section class="view" id="view-sstv-encode">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><button data-nav="#/radio">无线电小工具</button><span>/</span><button data-nav="#/sstv">SSTV 专辑</button><span>/</span><span>SSTV 编码</span></div>
+      <h1>SSTV 编码</h1>
+      <p class="sub">把图片编码成 SSTV 音频（Robot 36）。可以直接画，也可以上传图片，然后生成、试听或下载音频。</p>
+    </div>
+    <div class="toolstage">
+      <div class="panel">
+        <div class="draw-tools">
+          <button class="btn ghost" id="encClear">清空</button>
+          <div class="seg" id="encSeg">
+            <button data-t="pencil" class="on">画笔</button>
+            <button data-t="eraser">橡皮</button>
+          </div>
+          <input type="color" id="encColor" value="#16181d">
+          <label class="btn ghost" style="display:inline-flex"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M8 11l4 4 4-4M4 19h16"/></svg>上传图片<input type="file" id="encImg" accept="image/*" style="display:none"></label>
+        </div>
+        <canvas class="mini-canvas" id="encCanvas" width="320" height="240" style="margin-top:10px"></canvas>
+      </div>
+      <div class="panel">
+        <div class="row" style="margin-top:0">
+          <button class="btn" id="encGen"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M9 18V6l10 6z"/></svg>生成 SSTV 音频</button>
+          <button class="btn ghost" id="encPlay" disabled>试听</button>
+          <button class="btn ghost" id="encDl" disabled>下载 WAV</button>
+        </div>
+        <div class="status-line" id="encStatus">先画一张图或上传图片，再点击「生成 SSTV 音频」。</div>
+        <div class="progress" id="encProgress" style="display:none"><i id="encProgressBar"></i></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：解压小游戏 ===== -->
+  <section class="view" id="view-relax">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>解压小游戏</span></div>
+      <h1>解压小游戏</h1>
+      <p class="sub">放松一下，随手戳一戳。没有压力，想玩多久玩多久。</p>
+    </div>
+    <div class="grid2">
+      <div class="panel" style="grid-column:1/-1">
+        <div class="game-head">
+          <div style="display:flex;align-items:center;gap:10px">
+            <h3 style="font-size:16px">戳泡泡</h3>
+            <span class="score">得分 <span id="bubbleScore">0</span></span>
+          </div>
+          <div>
+            <button class="btn ghost" id="bubbleRestart">重新开始</button>
+          </div>
+        </div>
+        <div class="game-wrap">
+          <canvas class="mini-canvas" id="bubbleCanvas" height="420"></canvas>
+        </div>
+        <div class="hint" style="margin-top:8px">点一点泡泡，它会"啵"地破掉。戳完一屏会有新的。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：打发时间小游戏 ===== -->
+  <section class="view" id="view-killtime">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>打发时间小游戏</span></div>
+      <h1>打发时间小游戏</h1>
+      <p class="sub">无聊的时候，来这里玩两把。</p>
+    </div>
+    <div class="grid2">
+      <div class="panel">
+        <div class="game-head">
+          <h3 style="font-size:16px">贪吃蛇</h3>
+          <span class="score">长度 <span id="snakeScore">3</span></span>
+        </div>
+        <div class="game-wrap">
+          <canvas class="mini-canvas" id="snakeCanvas" height="420"></canvas>
+          <div class="dpad">
+            <div></div><button data-dir="up">▲</button><div></div>
+            <button data-dir="left">◀</button><button data-dir="down">▼</button><button data-dir="right">▶</button>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:8px">键盘方向键或屏幕方向键控制，吃到红色食物变长。</div>
+      </div>
+      <div class="panel">
+        <div class="game-head">
+          <h3 style="font-size:16px">记忆翻牌</h3>
+          <span class="score">翻牌 <span id="memoTurns">0</span></span>
+        </div>
+        <div class="game-wrap">
+          <canvas class="mini-canvas" id="memoCanvas" height="420"></canvas>
+        </div>
+        <div class="hint" style="margin-top:8px">翻开两张相同的牌即可消除，全部消除即通关。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：我做的游戏程序 ===== -->
+  <section class="view" id="view-mygames">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>我做的游戏的程序</span></div>
+      <h1>我做的游戏的程序</h1>
+      <p class="sub">这里是小张做过的游戏，站长在后台「添加内容」添加后会自动显示在这里。</p>
+    </div>
+    <div class="panel">
+      <div class="gallery" id="mygameList"></div>
+    </div>
+  </section>
+
+  <!-- ===== 视图：资源库 ===== -->
+  <section class="view" id="view-library">
+    <div class="pagehead">
+      <div class="crumb"><button data-nav="#/home">首页</button><span>/</span><span>我的资源库</span></div>
+      <h1>我的资源库</h1>
+      <p class="sub">收藏的资料、软件、素材，按分类整理。内容来自大家的提交与站长审核。</p>
+    </div>
+    <div class="panel">
+      <div class="lib-cat" id="libBox"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="foot-brand">我的网站</div>
+  <div>个人兴趣小站 · 无线电 / 小游戏 / 资源收集</div>
+</footer>
+
+<!-- ===== 隐藏入口（管理后台 + AI） ===== -->
+<div class="overlay" id="adminOverlay">
+  <!-- 纯白界面上方触发 -->
+  <div class="whitestage" id="whiteStage">
+    <div class="stage-trigger" id="stageTrigger" title=""></div>
+    <div class="ws-hint">·· ····· ··</div>
+  </div>
+  <!-- 登录 -->
+  <div class="login-wrap" id="loginWrap">
+    <div class="login-box">
+      <div class="lk">管理员登录</div>
+      <h2>请登录</h2>
+      <div class="field"><label>账号</label><input id="loginUser" value="" placeholder="请输入账号" autocomplete="off"></div>
+      <div class="field"><label>密码</label><input id="loginPass" type="password" placeholder="请输入密码" autocomplete="off"></div>
+      <div class="err" id="loginErr"></div>
+      <div class="row" style="justify-content:flex-end">
+        <button class="btn ghost" id="loginCancel">取消</button>
+        <button class="btn" id="loginGo">进入管理后台</button>
+      </div>
+    </div>
+  </div>
+  <!-- 管理后台 -->
+  <div class="admin" id="adminPanel">
+    <div class="admin-top">
+      <div class="at-l"><svg width="20" height="20" viewBox="0 0 32 32"><rect width="32" height="32" rx="7" fill="#0f4c81"/><path d="M7 17a9 9 0 0 1 18 0" stroke="#fff" stroke-width="2.4" fill="none"/><circle cx="16" cy="17" r="3.4" fill="#fff"/></svg>管理后台<span class="chip" id="roleChip">超级管理员</span></div>
+      <div class="at-r">
+        <button class="btn ghost admin-mobile-menu" id="adminMenuBtn">菜单</button>
+        <button class="btn ghost" id="adminLogout">退出登录</button>
+      </div>
+    </div>
+    <div class="admin-body">
+      <div class="admin-side" id="adminSide">
+        <div class="sec">核心</div>
+        <button class="mitem on" id="miAi" data-apane="ai"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M8 10h8M8 14h5"/></svg>内置 AI 助手</button>
+        <div class="sec">站点</div>
+        <button class="mitem" id="miInfo" data-apane="info"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="8.5"/><path d="M12 8v.01M12 11v5"/></svg>站点信息</button>
+        <button class="mitem" id="miData" data-apane="data"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>本地数据</button>
+        <button class="mitem" id="miSettings" data-apane="settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9L17 7M7 17l-2.1 2.1"/></svg>站点设置（多人在线）</button>
+        <button class="mitem" id="miAdd" data-apane="add"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 5v14M5 12h14"/><rect x="3" y="4" width="18" height="16" rx="2"/></svg>添加内容</button>
+        <button class="mitem" id="miAdmins" data-apane="admins"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.2 2.7-5 6-5s6 1.8 6 5"/><path d="M17 8l1.6 1.6L22 6.5"/></svg>普通管理员</button>
+        <div class="sec">协作</div>
+        <button class="mitem" id="miReview" data-apane="review"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="8.5"/></svg>内容审核</button>
+        <div class="sec">快捷跳转</div>
+        <button class="mitem" data-nav="#/home">返回首页</button>
+        <button class="mitem" data-nav="#/radio">无线电小工具</button>
+        <button class="mitem" data-nav="#/killtime">小游戏</button>
+      </div>
+      <div class="admin-main" id="adminMain">
+        <div class="apane" id="apane-ai">
+          <div class="chat">
+            <div class="chat-head"><h3>内置 AI 助手</h3><p>关于本站的轻量本地助手，可以聊天、介绍本站功能。</p></div>
+            <div class="msgbox" id="chatBox"></div>
+            <div class="quick" id="chatQuick">
+              <button>介绍一下本站</button>
+              <button>什么是 SSTV</button>
+              <button>怎么用编码工具</button>
+              <button>小游戏有哪些</button>
+            </div>
+            <div class="chat-input">
+              <input id="chatInput" placeholder="输入你想问的…" autocomplete="off">
+              <button class="btn" id="chatSend">发送</button>
+            </div>
+          </div>
+        </div>
+        <div class="apane" id="apane-info" style="display:none"></div>
+        <div class="apane" id="apane-data" style="display:none"></div>
+        <div class="apane" id="apane-admins" style="display:none"></div>
+        <div class="apane" id="apane-review" style="display:none"></div>
+        <div class="apane" id="apane-settings" style="display:none"></div>
+        <div class="apane" id="apane-add" style="display:none"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== 全局工具 ===================== */
+const $=s=>document.querySelector(s);
+const $$=s=>Array.from(document.querySelectorAll(s));
+const store={
+  get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+/* ===================== 可插拔共享数据层 =====================
+   默认用浏览器本地存储；超级管理员在后台「站点设置」填入服务器地址并开启远程后，
+   每次写入都会推到服务器、读取时后台拉取合并，实现多设备同步。
+   服务器只需实现：GET  <url>?key=xxx  ->  {data:...}   ；POST <url>  body {key,value}  */
+const DB={
+  cfg(){return store.get('site_config',{});},
+  remote(){const c=DB.cfg();return (c.backend==='remote'&&c.url)?c.url:null;},
+  get(key,def){const u=DB.remote();if(u)DB._pull(key,def);return store.get(key,def);},
+  set(key,val){store.set(key,val);const u=DB.remote();if(u)DB._push(key,val);},
+  _push(key,val){try{fetch(DB.remote(),{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({key,value:val})}).catch(()=>{});}catch(e){}},
+  _pull(key,def){try{fetch(DB.remote()+'?key='+encodeURIComponent(key)).then(r=>r.json()).then(j=>{if(j&&j.data!==undefined){const v=j.data;if(JSON.stringify(v)!==JSON.stringify(store.get(key,def))){store.set(key,v);if(window.onDataSync)window.onDataSync(key);}}}).catch(()=>{});}catch(e){}},
+  // 从服务器强制拉取一组键并刷新
+  sync(keys,cb){const u=DB.remote();if(!u){if(cb)cb();return;}
+    let done=0;keys.forEach(k=>{fetch(u+'?key='+encodeURIComponent(k)).then(r=>r.json()).then(j=>{if(j&&j.data!==undefined)store.set(k,j.data);}).catch(()=>{}).finally(()=>{if(++done===keys.length&&cb)cb();});});
+  }
+};
+/* ===================== 初始内容区（写进网页文件的内容，所有人可见） =====================
+   站长在后台「添加内容」添加后，点「下载更新版网页」会把这里的内容更新，重新上传即可让所有访客看到。 */
+const INIT_DATA={
+  'site_mygames':[],   // 小游戏 → 游戏程序页 {name,desc,link}
+  'site_library':[],   // 资源库 {cat,name,desc,link}
+  'site_radio':[]      // 无线电 → 无线电页 {name,desc,link,author}
+};
+/* 显示内容 = 写进文件的内容 + 本机添加的内容（按名称去重） */
+function getItems(key){
+  const base=INIT_DATA[key]||[];
+  const local=store.get(key,[]);
+  return base.concat(local.filter(x=>!base.some(b=>b.name===x.name)));
+}
+let toastTimer;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove('show'),2200);}
+
+/* ===================== 视图路由 ===================== */
+function route(){
+  const h=(location.hash||'#/home').replace(/^#\/?/,'/');
+  const map={'/home':'view-home','/intro':'view-intro','/radio':'view-radio','/sstv':'view-sstv',
+    '/sstv-decode':'view-sstv-decode','/sstv-encode':'view-sstv-encode','/relax':'view-relax',
+    '/killtime':'view-killtime','/mygames':'view-mygames','/library':'view-library','/feedback':'view-feedback'};
+  const id=map[h]||'view-home';
+  $$('.view').forEach(v=>v.classList.toggle('active',v.id===id));
+  window.scrollTo(0,0);
+  if(id==='view-home')return;
+  initView(id);
+}
+window.addEventListener('hashchange',route);
+document.addEventListener('click',e=>{
+  const n=e.target.closest('[data-nav]');
+  if(n){location.hash=n.getAttribute('data-nav');}
+});
+const inited={};
+const initFns={'view-intro':'initIntro','view-radio':'initRadio','view-sstv':'initSstv','view-sstv-decode':'initSstvDecode','view-sstv-encode':'initSstvEncode','view-relax':'initRelax','view-killtime':'initKilltime','view-mygames':'initMygames','view-library':'initLibrary','view-feedback':'initFeedback'};
+function initView(id){
+  if(inited[id])return;
+  const name=initFns[id];
+  if(!name)return;
+  if(typeof window[name]==='function'){inited[id]=true;window[name]();}
+  else{setTimeout(()=>initView(id),40);} // 初始化函数尚未定义（深链加载）时延迟重试
+}
+// 深链（带 #/xxx 哈希）加载时延迟到所有脚本定义完毕再路由
+if(location.hash&&location.hash!=='#/home'){setTimeout(route,0);}else{route();}
+
+/* ===================== 隐藏入口：管理后台 ===================== */
+(function(){
+  // —— 入口一：左上角 2 下 + 右上角 2 下 → 进入纯白界面 ——
+  let tlC=0,trC=0,seqT=null;
+  function resetSeq(){tlC=0;trC=0;}
+  function bump(k){
+    if(k==='tl')tlC++;else trC++;
+    clearTimeout(seqT);
+    seqT=setTimeout(resetSeq,4000);
+    if(tlC>=2&&trC>=2){resetSeq();openWhiteStage();}
+  }
+  $('#triggerTl').addEventListener('click',()=>bump('tl'));
+  $('#adminTrigger').addEventListener('click',()=>bump('tr'));
+
+  const overlay=$('#adminOverlay');
+  const whiteStage=$('#whiteStage');
+  function openWhiteStage(){
+    overlay.classList.add('show');
+    whiteStage.style.display='block';
+    $('#loginWrap').classList.remove('show');
+    $('#adminPanel').classList.remove('show');
+  }
+  // —— 入口二：纯白界面右上角 5 下 → 登录 ——
+  let sC=0,sT=null;
+  $('#stageTrigger').addEventListener('click',()=>{
+    sC++;clearTimeout(sT);sT=setTimeout(()=>sC=0,1800);
+    if(sC>=5){sC=0;$('#loginWrap').classList.add('show');whiteStage.style.display='none';}
+  });
+
+  // —— 超级管理员 / 10 个随机普通管理员 ——
+  const SUPER_KEY='site_super';
+  function getSuper(){
+    const s=store.get(SUPER_KEY,null);
+    return (s&&s.user&&s.pass)?{user:s.user,pass:s.pass}:{user:'小张的网站',pass:'123321318417'};
+  }
+  function setSuperPass(newPass){store.set(SUPER_KEY,{user:getSuper().user,pass:newPass});}
+  window.getSuper=getSuper;window.setSuperPass=setSuperPass;
+  const ADM_KEY='site_admins';
+  const CHARS='abcdefghjkmnpqrstuvwxyz23456789';
+  function rnd(n){let s='';for(let i=0;i<n;i++)s+=CHARS[Math.floor(Math.random()*CHARS.length)];return s;}
+  function genAdms(){
+    const list=[];
+    for(let i=1;i<=10;i++)list.push({user:'admin_'+rnd(6),pass:rnd(8),name:'普通管理员'+i});
+    store.set(ADM_KEY,list);return list;
+  }
+  function getAdms(){const a=store.get(ADM_KEY,null);if(!Array.isArray(a)||a.length!==10)return genAdms();return a;}
+  window.genAdms=genAdms;window.getAdms=getAdms;
+  getAdms();
+
+  // 登录
+  $('#loginGo').addEventListener('click',doLogin);
+  $('#loginPass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  $('#loginUser').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin();});
+  $('#loginCancel').addEventListener('click',()=>overlay.classList.remove('show'));
+  function doLogin(){
+    const u=$('#loginUser').value.trim();
+    const p=$('#loginPass').value.replace(/\s+/g,'');
+    const sup=getSuper();
+    let role=null;
+    if(u===sup.user&&p===sup.pass){role='super';}
+    else if(getAdms().some(a=>a.user===u&&a.pass===p)){role='normal';}
+    if(!role){$('#loginErr').textContent='账号或密码不正确';return;}
+    $('#loginErr').textContent='';
+    $('#loginWrap').classList.remove('show');
+    $('#adminPanel').classList.add('show');
+    enterAdmin(role);
+  }
+
+  // 按角色布置管理后台
+  window.applyRole=function(role){
+    window._role=role;
+    $('#roleChip').textContent=(role==='super')?'超级管理员':'普通管理员';
+    $('#roleChip').classList.toggle('normal',role!=='super');
+    $('#miAdmins').style.display=(role==='super')?'':'none';
+    $('#miData').style.display=(role==='super')?'':'none';
+    $('#miSettings').style.display=(role==='super')?'':'none'; // 站点设置仅超管
+    $('#miAdd').style.display=(role==='super')?'':'none'; // 添加内容仅超管
+    // 内容审核：超管与普通管理员都可审核
+    $('#miReview').style.display='';
+    $$('.mitem[data-apane]').forEach(x=>x.classList.remove('on'));
+    $('#miAi').classList.add('on');
+    ['ai','info','data','admins','review','settings','add'].forEach(p=>{const el=$('#apane-'+p);if(el)el.style.display=(p==='ai')?'block':'none';});
+    if(role==='super'&&window.renderAdmins)window.renderAdmins();
+  };
+
+  $('#adminLogout').addEventListener('click',()=>{
+    overlay.classList.remove('show');
+    toast('已退出管理后台');
+  });
+  $('#adminMenuBtn').addEventListener('click',()=>$('#adminSide').classList.toggle('mobile-show'));
+
+  // 管理后台导航
+  $$('.mitem[data-apane]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      $$('.mitem[data-apane]').forEach(x=>x.classList.toggle('on',x===b));
+      ['ai','info','data','admins','review','settings','add'].forEach(p=>{$('#apane-'+p).style.display=(p===b.getAttribute('data-apane'))?'block':'none';});
+      $('#adminSide').classList.remove('mobile-show');
+      if(b.getAttribute('data-apane')==='review')window.renderReview();
+      if(b.getAttribute('data-apane')==='settings')window.renderSettings();
+      if(b.getAttribute('data-apane')==='add')window.renderAdd();
+    });
+  });
+})();
+</script>
+<script>
+/* ===================== 静态视图初始化 ===================== */
+function initIntro(){}
+function initRadio(){
+  const items=getItems('site_radio');
+  const tag=$('#radioSubTag');
+  const box=$('#radioSub');
+  if(!items.length){tag.style.display='none';box.innerHTML='';return;}
+  tag.style.display='block';
+  box.innerHTML=items.map(it=>`<div class="listrow">
+    <div class="l-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8c4-3 8 4 12-1s6 2 6 2"/><path d="M5 16h4M5 13h4"/></svg></div>
+    <div class="l-b"><div class="l-t">${esc(it.name)}<span class="sg-cat">${esc(it.author||'匿名')}</span></div><div class="l-d">${esc(it.desc||'')}</div></div>
+    ${it.link?`<a class="l-link" href="${esc(it.link)}" target="_blank" rel="noopener">打开</a>`:''}
+  </div>`).join('');
+}
+function initSstv(){}
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtSize(n){return n<1024?n+' B':n<1048576?(n/1024).toFixed(1)+' KB':(n/1048576).toFixed(1)+' MB';}
+
+/* ===================== 我做的游戏的程序（只读展示，内容来自审核采纳） ===================== */
+function initMygames(){
+  const KEY='site_mygames';
+  function render(){
+    const items=getItems(KEY);
+    const box=$('#mygameList');
+    if(!items.length){
+      box.innerHTML='<div class="empty"><div class="big">还没有游戏</div><div>站长在后台添加后会显示在这里。</div></div>';
+      return;
+    }
+    box.innerHTML=items.map(g=>`<div class="entry">
+      <div class="e-t">${esc(g.name)}</div>
+      <div class="e-d">${esc(g.desc||'')}</div>
+      ${g.link?`<a class="e-link" href="${esc(g.link)}" target="_blank" rel="noopener">打开</a>`:''}
+    </div>`).join('');
+  }
+  render();
+}
+
+/* ===================== 资源库（只读展示，内容来自审核采纳） ===================== */
+function initLibrary(){
+  const KEY='site_library';
+  const CATS=['无线电','影像','游戏','学习','工具','代码','其他'];
+  function render(){
+    const items=getItems(KEY);
+    const box=$('#libBox');
+    let html='';
+    let total=items.length;
+    CATS.forEach(cat=>{
+      const list=items.filter(i=>i.cat===cat);
+      if(!list.length)return;
+      html+=`<div class="cat-head">${esc(cat)}<span class="cnt">${list.length}</span></div>`;
+      list.forEach(it=>{
+        html+=`<div class="listrow">
+          <div class="l-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M8 3v18M16 3v18"/></svg></div>
+          <div class="l-b"><div class="l-t">${esc(it.name)}</div><div class="l-d">${esc(it.desc||'')}</div></div>
+          ${it.link?`<a class="l-link" href="${esc(it.link)}" target="_blank" rel="noopener">打开</a>`:''}
+        </div>`;
+      });
+    });
+    if(!total)html='<div class="empty"><div class="big">资源库还是空的</div><div>站长在后台添加后会显示在这里。</div></div>';
+    box.innerHTML=html;
+  }
+  render();
+}
+
+/* ===================== 建议箱：一键复制微信号 ===================== */
+function initFeedback(){
+  const WX='BA3MJX';
+  $('#wxCopy').addEventListener('click',()=>{
+    if(navigator.clipboard&&navigator.clipboard.writeText){
+      navigator.clipboard.writeText(WX).then(()=>toast('微信号已复制：'+WX)).catch(()=>fallbackCopy(WX));
+    }else{
+      fallbackCopy(WX);
+    }
+  });
+  function fallbackCopy(v){
+    const ta=document.createElement('textarea');
+    ta.value=v;ta.style.position='fixed';ta.style.opacity='0';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('微信号已复制：'+v);}
+    catch(e){toast('请手动复制：'+v);}
+    document.body.removeChild(ta);
+  }
+}
+
+/* ===================== 提交与审核（采纳自动归位） ===================== */
+const SUB_KEY='site_submissions';
+function getSubs(){return DB.get(SUB_KEY,[]);}
+function setSubs(v){DB.set(SUB_KEY,v);}
+/* 采纳后自动归位：小游戏→游戏程序页、无线电→无线电页、资源/代码/其他→资源库对应分类 */
+function adoptItem(sub){
+  if(sub.type==='小游戏'){
+    const g=DB.get('site_mygames',[]);
+    if(!g.some(x=>x.name===sub.name)){g.push({name:sub.name,desc:sub.desc,link:sub.link||''});DB.set('site_mygames',g);}
+  }else if(sub.type==='无线电'){
+    const r=DB.get('site_radio',[]);
+    if(!r.some(x=>x.name===sub.name)){r.push({name:sub.name,desc:sub.desc,link:sub.link||'',author:sub.author||'匿名'});DB.set('site_radio',r);}
+  }else{
+    const cat = sub.type==='代码' ? '代码' : (sub.type==='资源' ? (sub.cat||'其他') : '其他');
+    const l=DB.get('site_library',[]);
+    if(!l.some(x=>x.name===sub.name&&x.cat===cat)){l.push({cat,name:sub.name,desc:sub.desc,link:sub.link||''});DB.set('site_library',l);}
+  }
+}
+/* 从被采纳列表移除（管理员清理用） */
+function removeAdopted(sub){
+  if(sub.type==='小游戏'){DB.set('site_mygames',DB.get('site_mygames',[]).filter(x=>x.name!==sub.name));}
+  else if(sub.type==='无线电'){DB.set('site_radio',DB.get('site_radio',[]).filter(x=>x.name!==sub.name));}
+  else{DB.set('site_library',DB.get('site_library',[]).filter(x=>!(x.name===sub.name&&(sub.type==='代码'?(x.cat==='代码'):1))));}
+}
+
+/* ===================== 远程同步后刷新当前页面 ===================== */
+window.onDataSync=function(key){
+  try{
+    const h=(location.hash||'').replace(/^#\/?/,'/');
+    if(h==='/mygames')initMygames();
+    else if(h==='/library')initLibrary();
+    else if(h==='/radio')initRadio();
+    if(window.renderReview)window.renderReview();
+  }catch(e){}
+};
+
+/* ===================== 解压小游戏：戳泡泡 ===================== */
+function initRelax(){
+  const c=$('#bubbleCanvas');
+  c.width=720;c.height=420;
+  const ctx=c.getContext('2d');
+  let bubbles=[],score=0,popFx=[],raf=null,last=0;
+  function spawn(n){
+    for(let i=0;i<n;i++){
+      const r=16+Math.random()*26;
+      bubbles.push({x:r+Math.random()*(c.width-2*r),y:r+Math.random()*(c.height-2*r),
+        r,base:Math.random()*Math.PI*2,amp:2+Math.random()*3,speed:.8+Math.random()*1.4,hue:200+Math.random()*60,
+        lit:.55+Math.random()*.25});
+    }
+  }
+  function reset(){bubbles=[];score=0;$('#bubbleScore').textContent='0';popFx=[];spawn(26);}
+  function draw(t){
+    ctx.clearRect(0,0,c.width,c.height);
+    const sec=t/1000;
+    bubbles.forEach(b=>{
+      const px=b.x+Math.sin(sec*b.speed+b.base)*b.amp;
+      const py=b.y+Math.cos(sec*b.speed*1.3+b.base*2)*b.amp*0.6;
+      const g=ctx.createRadialGradient(px-b.r*.35,py-b.r*.4,b.r*.08,px,py,b.r);
+      g.addColorStop(0,`hsla(${b.hue},70%,95%,${b.lit})`);
+      g.addColorStop(.55,`hsla(${b.hue},60%,78%,${b.lit})`);
+      g.addColorStop(1,`hsla(${b.hue},55%,65%,${b.lit})`);
+      ctx.beginPath();ctx.arc(px,py,b.r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+      ctx.beginPath();ctx.arc(px,py,b.r,0,Math.PI*2);ctx.strokeStyle=`hsla(${b.hue},50%,55%,.6)`;ctx.lineWidth=1.5;ctx.stroke();
+      ctx.beginPath();ctx.arc(px-b.r*.3,py-b.r*.35,b.r*.18,0,Math.PI*2);ctx.fillStyle='rgba(255,255,255,.85)';ctx.fill();
+    });
+    popFx=popFx.filter(f=>{
+      f.t+=1;
+      if(f.t>16)return false;
+      const k=f.t/16;
+      ctx.beginPath();ctx.arc(f.x,f.y,f.r*(1+k*1.2),0,Math.PI*2);
+      ctx.strokeStyle=`rgba(255,255,255,${.8*(1-k)})`;ctx.lineWidth=2;ctx.stroke();
+      return true;
+    });
+    raf=requestAnimationFrame(draw);
+  }
+  function hit(clientX,clientY){
+    const rect=c.getBoundingClientRect();
+    const x=(clientX-rect.left)*c.width/rect.width;
+    const y=(clientY-rect.top)*c.height/rect.height;
+    let best=null,bd=1e9;
+    for(let i=0;i<bubbles.length;i++){const b=bubbles[i];const d=Math.hypot(x-b.x,y-b.y);if(d<b.r+10&&d<bd){bd=d;best=i;}}
+    if(best!=null){
+      const b=bubbles.splice(best,1)[0];
+      popFx.push({x:b.x,y:b.y,r:b.r,t:0});
+      score++;$('#bubbleScore').textContent=score;
+      if(bubbles.length<14)spawn(6);
+    }
+  }
+  c.addEventListener('pointerdown',e=>{e.preventDefault();hit(e.clientX,e.clientY);});
+  $('#bubbleRestart').addEventListener('click',()=>{reset();});
+  reset();if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(draw);
+}
+
+/* ===================== 打发时间小游戏：贪吃蛇 + 记忆翻牌 ===================== */
+function initKilltime(){
+  // --- 贪吃蛇 ---
+  const sc=$('#snakeCanvas');sc.width=400;sc.height=400;
+  const sctx=sc.getContext('2d');const CELL=20,N=20;
+  let snake,direct,nextDir,food,run=null,speed=140,over=false;
+  function snakeReset(){
+    snake=[{x:9,y:10},{x:8,y:10},{x:7,y:10}];
+    direct={x:1,y:0};nextDir=direct;over=false;
+    placeFood();updateScore();
+  }
+  function placeFood(){do{food={x:Math.floor(Math.random()*N),y:Math.floor(Math.random()*N)}}while(snake.some(s=>s.x===food.x&&s.y===food.y));}
+  function updateScore(){$('#snakeScore').textContent=snake.length;}
+  function step(){
+    direct=nextDir;
+    const head={x:snake[0].x+direct.x,y:snake[0].y+direct.y};
+    if(head.x<0||head.y<0||head.x>=N||head.y>=N||snake.some(s=>s.x===head.x&&s.y===head.y)){over=true;drawSnake();clearInterval(run);run=null;return;}
+    snake.unshift(head);
+    if(head.x===food.x&&head.y===food.y){placeFood();updateScore();}
+    else snake.pop();
+    drawSnake();
+  }
+  function drawSnake(){
+    sctx.clearRect(0,0,400,400);sctx.fillStyle='#fafbfc';sctx.fillRect(0,0,400,400);
+    for(let i=0;i<N;i++){for(let j=0;j<N;j++){if((i+j)%2===0){sctx.fillStyle='#f1f3f6';sctx.fillRect(i*CELL,j*CELL,CELL,CELL);}}}
+    sctx.fillStyle='#e0432f';sctx.beginPath();sctx.arc(food.x*CELL+10,food.y*CELL+10,7,0,Math.PI*2);sctx.fill();
+    snake.forEach((s,i)=>{
+      sctx.fillStyle=i===0?'#0f6b45':'#1e7d4f';
+      sctx.beginPath();sctx.roundRect(s.x*CELL+1.5,s.y*CELL+1.5,CELL-3,CELL-3,5);sctx.fill();
+    });
+    if(over){sctx.fillStyle='rgba(22,24,29,.72)';sctx.fillRect(0,0,400,400);
+      sctx.fillStyle='#fff';sctx.font='700 26px sans-serif';sctx.textAlign='center';
+      sctx.fillText('游戏结束 · 点击重开',200,190);}
+  }
+  sc.addEventListener('click',()=>{if(over){snakeReset();startSnake();}});
+  function setDir(x,y){
+    if(!over&&!(direct.x===-x&&direct.y===-y))nextDir={x,y};
+  }
+  document.addEventListener('keydown',e=>{
+    if(!$('#view-killtime').classList.contains('active'))return;
+    const k=e.key;
+    if(k==='ArrowUp'){e.preventDefault();setDir(0,-1);}
+    else if(k==='ArrowDown'){e.preventDefault();setDir(0,1);}
+    else if(k==='ArrowLeft'){e.preventDefault();setDir(-1,0);}
+    else if(k==='ArrowRight'){e.preventDefault();setDir(1,0);}
+  });
+  $$('#view-killtime [data-dir]').forEach(b=>b.addEventListener('click',()=>{
+    const d=b.getAttribute('data-dir');
+    if(d==='up')setDir(0,-1);else if(d==='down')setDir(0,1);else if(d==='left')setDir(-1,0);else if(d==='right')setDir(1,0);
+  }));
+  function startSnake(){if(run)clearInterval(run);run=setInterval(step,speed);drawSnake();}
+  snakeReset();startSnake();
+
+  // --- 记忆翻牌 ---
+  const mc=$('#memoCanvas');mc.width=400;mc.height=420;
+  const mctx=mc.getContext('2d');
+  const COLS=4,ROWS=4,CW=88,CH=90,OX=(400-COLS*CW)/2,OY=10;
+  const PAIRS=['A','B','C','D','E','F','G','H'];
+  const PCOLORS={A:'#d9483b',B:'#e0762a',C:'#d9a521',D:'#5f9e3d',E:'#2f8f6b',F:'#2f6fae',G:'#6b4fa0',H:'#b03a7a'};
+  let cards=[],flipped=[],locked=false,memoTurns=0,matched=0;
+  function memoReset(){
+    let ids=[];PAIRS.forEach(p=>{ids.push(p,p)});
+    for(let i=ids.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[ids[i],ids[j]]=[ids[j],ids[i]];}
+    cards=ids.map((v,i)=>({v,flip:false,done:false}));flipped=[];locked=false;matched=0;memoTurns=0;
+    $('#memoTurns').textContent='0';drawMemo();
+  }
+  function drawCard(x,y,card){
+    mctx.fillStyle=card.flip||card.done?'#ffffff':'#0f4c81';
+    mctx.beginPath();mctx.roundRect(x,y,CW,CH,10);mctx.fill();
+    mctx.strokeStyle='#d7dce3';mctx.lineWidth=1;mctx.stroke();
+    if(card.flip||card.done){
+      if(card.done){mctx.fillStyle='#eef1f4';mctx.fill();mctx.strokeStyle='#dfe4ea';}
+      mctx.fillStyle=card.done?'#c9d0d9':PCOLORS[card.v];
+      mctx.font='700 34px sans-serif';mctx.textAlign='center';mctx.textBaseline='middle';
+      mctx.fillText(card.v,x+CW/2,y+CH/2+2);
+    }
+  }
+  function drawMemo(){
+    mctx.fillStyle='#fafbfc';mctx.fillRect(0,0,400,420);
+    cards.forEach((card,i)=>{
+      const r=Math.floor(i/COLS),c=i%COLS;
+      drawCard(OX+c*CW,OY+r*CH,card);
+    });
+    if(matched===8){mctx.fillStyle='rgba(22,24,29,.72)';mctx.fillRect(0,0,400,420);
+      mctx.fillStyle='#fff';mctx.font='700 24px sans-serif';mctx.textAlign='center';
+      mctx.fillText('全部消除！点击重开',200,210);}
+  }
+  mc.addEventListener('click',e=>{
+    if(matched===8){memoReset();return;}
+    if(locked)return;
+    const rect=mc.getBoundingClientRect();
+    const x=(e.clientX-rect.left)*mc.width/rect.width;
+    const y=(e.clientY-rect.top)*mc.height/rect.height;
+    const col=Math.floor((x-OX)/CW),row=Math.floor((y-OY)/CH);
+    if(col<0||col>=COLS||row<0||row>=ROWS)return;
+    const i=row*COLS+col;const card=cards[i];
+    if(card.flip||card.done||flipped.length>=2)return;
+    card.flip=true;flipped.push(i);memoTurns++;$('#memoTurns').textContent=memoTurns;
+    drawMemo();
+    if(flipped.length===2){
+      locked=true;
+      const [a,b]=flipped;
+      if(cards[a].v===cards[b].v){cards[a].done=cards[b].done=true;matched++;flipped=[];locked=false;drawMemo();}
+      else{setTimeout(()=>{cards[a].flip=cards[b].flip=false;flipped=[];locked=false;drawMemo();},650);}
+    }
+  });
+  memoReset();
+}
+
+/* ===================== 管理后台：内置 AI ===================== */
+(function(){
+  const AI_KEY='admin_chat';
+  function botSay(txt){addMsg(txt,'bot');}
+  function addMsg(txt,who){
+    const box=$('#chatBox');
+    const d=document.createElement('div');d.className='msg '+who;
+    d.innerHTML='<span class="who">'+(who==='user'?'我':'内置 AI')+'</span>'+esc(txt);
+    box.appendChild(d);box.scrollTop=box.scrollHeight;
+  }
+  function aiReply(q){
+    const s=q.toLowerCase();
+    if(/(你好|嗨|哈喽|在吗|hi|hello)/.test(s))return '你好呀，我是这个网站内置的小助手。想了解本站的哪个部分？';
+    if(/你是谁|你叫什么|介绍一下你/.test(s))return '我是站长内置在本站管理后台里的轻量 AI 助手。我可以介绍本站功能，聊聊无线电，推荐点小游戏。';
+    if(/介绍.*站|站.*什么|有什么功能|功能|介绍.*这个|首页/.test(s))return '本站目前有这几个板块：\n1. 我的简介 —— 关于站长\n2. 无线电小工具 —— 里面有 SSTV 专辑（编码 / 解码）\n3. 解压小游戏 —— 戳泡泡\n4. 打发时间小游戏 —— 贪吃蛇、记忆翻牌\n5. 我做的游戏的程序\n6. 我的资源库\n可以从首页点进去，也可以问我具体玩法。';
+    if(/sstv|慢扫描/.test(s)){
+      if(/编码|怎么.*发|传图|生成.*音频/.test(s))return 'SSTV 编码：进入「无线电小工具 → SSTV 专辑 → SSTV 编码」。可以先在画布上画画或上传图片，然后点「生成 SSTV 音频」，生成后可试听或下载 WAV，用对讲机或声卡播放即可发送。';
+      if(/解码|怎么.*收|解图|解码.*音频/.test(s))return 'SSTV 解码：进入「无线电小工具 → SSTV 专辑 → SSTV 解码」。可以点「开始解码」用麦克风收听，或直接上传一个 SSTV 音频文件，等待解码完成就会在画布上显示图片。';
+      return 'SSTV 是慢扫描电视（Slow-Scan Television），通过声音逐行传图片，业余无线电常用。本站内置了 SSTV 编码（图片→音频）和解码（音频→图片），支持 Robot 36 格式。';
+    }
+    if(/游戏|玩|小游戏/.test(s))return '本站有两个游戏区：\n· 解压小游戏：戳泡泡（放松用）\n· 打发时间小游戏：贪吃蛇、记忆翻牌\n在首页点进去就能玩。';
+    if(/贪吃蛇|蛇/.test(s))return '贪吃蛇在「打发时间小游戏」里。用方向键或屏幕上的方向按钮控制，吃到红色食物会变长，撞墙或撞到自己就结束。';
+    if(/翻牌|记忆/.test(s))return '记忆翻牌也在「打发时间小游戏」里。翻开两张相同的字母牌即可消除，翻完 8 组就通关，记录你翻了多少次。';
+    if(/戳泡泡|泡泡|解压/.test(s))return '戳泡泡在「解压小游戏」里。点一下泡泡就破掉，有得分，没有压力，随便玩。';
+    if(/资源|收藏/.test(s))return '「我的资源库」按分类整理收藏的资料和工具，支持自己添加、删除，数据存在浏览器本地。';
+    if(/无线电|业余/.test(s))return '站长喜欢业余无线电，本站的「无线电小工具」里现在有 SSTV 编码和解码，后续会加频点换算、摩尔斯电码等工具。';
+    if(/谁做|谁建|站长|作者/.test(s))return '这个网站是站长自己搭建的，用来整理自己的无线电爱好、小游戏和资源收藏。';
+    if(/存储|数据|保存|local|本地/.test(s))return '本站的「资源库」和「游戏程序」等内容存在你浏览器的本地存储里，换浏览器或清缓存会消失。';
+    return '这个问题我暂时没太看懂。你可以试试问我：\n· 介绍一下本站\n· 什么是 SSTV\n· 怎么用编码 / 解码工具\n· 小游戏有哪些';
+  }
+  function send(){
+    const inp=$('#chatInput');const t=inp.value.trim();
+    if(!t)return;addMsg(t,'user');inp.value='';
+    setTimeout(()=>botSay(aiReply(t)),260);
+  }
+  $('#chatSend').addEventListener('click',send);
+  $('#chatInput').addEventListener('keydown',e=>{if(e.key==='Enter')send();});
+  $('#chatQuick').addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    addMsg(b.textContent,'user');setTimeout(()=>botSay(aiReply(b.textContent)),260);
+  });
+  window.enterAdmin=function(role){
+    if(window.applyRole)applyRole(role||'super');
+    $('#chatBox').innerHTML='';
+    botSay(role==='normal'?'欢迎，普通管理员。你可以使用内置 AI 助手，并查看站点信息；管理类功能仅超级管理员可用。':'欢迎，超级管理员。你是本站最高权限，可管理本地数据与普通管理员。有需要随时问我。');
+  };
+  // 站点信息 / 本地数据
+  function renderAdminPanes(){
+    $('#apane-info').innerHTML=`<div class="chat-head"><h3>站点信息</h3><p>本站的当前概况。</p></div>
+      <div class="grid2">
+        <div class="card"><h3>板块数量</h3><p>7 个板块：简介 / 无线电 / 解压 / 打发时间 / 游戏程序 / 资源库 / 建议箱</p></div>
+        <div class="card"><h3>无线电工具</h3><p>SSTV 编码 + SSTV 解码（Robot 36）</p></div>
+        <div class="card"><h3>小游戏</h3><p>戳泡泡 / 贪吃蛇 / 记忆翻牌</p></div>
+        <div class="card"><h3>管理入口</h3><p>左上角 2 下 + 右上角 2 下 → 纯白界面右上角 5 下 → 登录</p></div>
+      </div>`;
+    const g=DB.get('site_mygames',[]).length;
+    const l=DB.get('site_library',[]).length;
+    const r=DB.get('site_radio',[]).length;
+    const s=DB.get('site_submissions',[]).length;
+    $('#apane-data').innerHTML=`<div class="chat-head"><h3>本地数据</h3><p>站内已采纳与待审核的内容。</p></div>
+      <div class="grid2">
+        <div class="card"><h3>游戏程序</h3><p>${g} 条</p></div>
+        <div class="card"><h3>资源库</h3><p>${l} 条</p></div>
+        <div class="card"><h3>无线电资源</h3><p>${r} 条</p></div>
+        <div class="card"><h3>提交记录</h3><p>${s} 条</p></div>
+      </div>
+      <div class="panel"><div class="hint">提示：数据默认保存在浏览器本地；超级管理员在「站点设置」填好服务器地址后，会与服务器双向同步，实现多人在线共享。</div></div>`;
+  }
+  // 管理员管理（仅超级管理员可见）
+  function renderAdmins(){
+    const list=window.getAdms();
+    const sup=window.getSuper();
+    $('#apane-admins').innerHTML=`<div class="chat-head"><h3>管理员管理</h3><p>超级管理员可以修改自己的密码，也可以修改 10 个普通管理员的账号与密码。</p></div>
+      <div class="adm-sec">超级管理员</div>
+      <div class="panel">
+        <div class="adm-row"><div class="adm-u" style="font-weight:700">账号：${esc(sup.user)}</div></div>
+        <div class="adm-edit-row" style="margin-top:8px">
+          <input class="adm-inp" id="spCur" type="password" placeholder="当前密码">
+          <input class="adm-inp" id="spNew" type="password" placeholder="新密码">
+          <input class="adm-inp" id="spNew2" type="password" placeholder="确认新密码">
+          <button class="btn sm" id="spSave">修改密码</button>
+        </div>
+      </div>
+      <div class="adm-sec">普通管理员（10 个）</div>
+      <div class="panel">
+        ${list.map((a,i)=>`<div class="adm-row">
+          <div class="adm-no">${i+1}</div>
+          <div class="adm-edit-row" style="flex:1;min-width:0">
+            <input class="adm-inp" id="au${i}" value="${esc(a.user)}" placeholder="账号">
+            <input class="adm-inp" id="ap${i}" value="${esc(a.pass)}" placeholder="密码">
+            <button class="btn ghost sm" data-save="${i}">保存</button>
+          </div>
+        </div>`).join('')}
+      </div>
+      <div class="row" style="margin-top:14px;flex-wrap:wrap;gap:10px"><button class="btn ghost" id="admRegen">重新随机生成 10 个</button></div>`;
+    $$('#apane-admins [data-save]').forEach(b=>b.addEventListener('click',()=>{
+      const i=+b.getAttribute('data-save');
+      const u=$('#au'+i).value.trim();
+      const p=$('#ap'+i).value.trim();
+      if(!u||!p){toast('账号和密码不能为空');return;}
+      const cur=window.getAdms();
+      if(cur.some((a,j)=>j!==i&&a.user===u)){toast('该账号已被占用');return;}
+      cur[i].user=u;cur[i].pass=p;
+      store.set('site_admins',cur);
+      renderAdmins();toast('已保存');
+    }));
+    $('#spSave').addEventListener('click',()=>{
+      const cur=window.getSuper().pass;
+      const c=$('#spCur').value.replace(/\s+/g,'');
+      const n=$('#spNew').value.trim();
+      const n2=$('#spNew2').value.trim();
+      if(c!==cur){toast('当前密码不正确');return;}
+      if(!n){toast('新密码不能为空');return;}
+      if(n!==n2){toast('两次输入的新密码不一致');return;}
+      window.setSuperPass(n);
+      $('#spCur').value=$('#spNew').value=$('#spNew2').value='';
+      renderAdmins();toast('超级管理员密码已修改');
+    });
+    $('#admRegen').addEventListener('click',()=>{window.genAdms();renderAdmins();toast('已重新随机生成 10 个普通管理员');});
+  }
+
+  // 内容审核（超级管理员与普通管理员均可审核）
+  function renderReview(){
+    const list=getSubs();
+    const pending=list.filter(s=>s.status==='pending');
+    const adopted=list.filter(s=>s.status==='adopted');
+    const rejected=list.filter(s=>s.status==='rejected');
+    const isSuper=window._role==='super';
+    const tpl=(s,i)=>`<div class="listrow">
+      <div class="l-b" style="flex:1">
+        <div class="l-t">${esc(s.name)}<span class="sg-cat">${esc(s.type)}</span><span class="f-t"> · ${esc(s.author)} · ${new Date(s.time).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'})}</span></div>
+        <div class="l-d" style="white-space:pre-wrap">${esc(s.desc||'')}</div>
+        ${s.link?`<div class="l-d"><a class="l-link" href="${esc(s.link)}" target="_blank" rel="noopener">${esc(s.link)}</a></div>`:''}
+        <div class="l-d" style="color:var(--muted);font-size:12px">${s.type==='资源'&&s.cat?('分类：'+esc(s.cat)):''}${s.status==='adopted'?' · 已采纳 → '+esc(adoptTarget(s.type)):''}</div>
+      </div>
+      <div class="row" style="gap:8px;flex-wrap:wrap">
+        ${s.status==='pending'?`<button class="btn sm" data-ok="${i}">采纳</button><button class="btn ghost sm" data-no="${i}">不采纳</button>`:''}
+        ${s.status==='adopted'?`<button class="btn ghost sm" data-unadopt="${i}">移除已采纳</button>`:''}
+        ${isSuper?`<button class="btn ghost sm danger" data-delsub="${i}">删除</button>`:''}
+      </div>
+    </div>`;
+    const render=function(tab,arr,emptyText){
+      const box=$('#reviewBox');
+      if(!box)return;
+      box.innerHTML=arr.length?`<div class="panel">${arr.map(tpl).join('')}</div>`:`<div class="empty"><div class="big">${emptyText}</div></div>`;
+      const re=function(){renderReview();window.onDataSync&&window.onDataSync();};
+      $$('#reviewBox [data-ok]').forEach(b=>b.addEventListener('click',()=>{
+        const i=+b.getAttribute('data-ok');const l=getSubs();l[i].status='adopted';
+        adoptItem(l[i]);setSubs(l);toast('已采纳，内容已归入对应页面');re();
+      }));
+      $$('#reviewBox [data-no]').forEach(b=>b.addEventListener('click',()=>{
+        const i=+b.getAttribute('data-no');const l=getSubs();l[i].status='rejected';setSubs(l);toast('已不采纳');re();
+      }));
+      $$('#reviewBox [data-unadopt]').forEach(b=>b.addEventListener('click',()=>{
+        const i=+b.getAttribute('data-unadopt');const l=getSubs();
+        removeAdopted(l[i]);l[i].status='pending';setSubs(l);toast('已从页面移除，退回待审核');re();
+      }));
+      $$('#reviewBox [data-delsub]').forEach(b=>b.addEventListener('click',()=>{
+        const i=+b.getAttribute('data-delsub');const l=getSubs();l.splice(i,1);setSubs(l);toast('已删除');re();
+      }));
+    };
+    $('#apane-review').innerHTML=`<div class="chat-head"><h3>内容审核</h3><p>审核大家提交的资源/游戏/代码。点「采纳」会自动按类型归入对应页面；点「不采纳」则拒绝。${isSuper?'':'（普通管理员可审核，删除仅超管）'}</p></div>
+      <div class="tabs" id="reviewTabs">
+        <button class="tab on" data-tab="pending">待审核 ${pending.length}</button>
+        <button class="tab" data-tab="adopted">已采纳 ${adopted.length}</button>
+        <button class="tab" data-tab="rejected">不采纳 ${rejected.length}</button>
+      </div>
+      <div class="row" style="margin:10px 0"><button class="btn ghost sm" id="reviewSync">从服务器刷新</button></div>
+      <div id="reviewBox"></div>`;
+    const cur=$('#reviewTabs .tab.on')?$('#reviewTabs .tab.on').getAttribute('data-tab'):'pending';
+    // 绑定 tab
+    $$('#reviewTabs .tab').forEach(t=>t.addEventListener('click',()=>{
+      $$('#reviewTabs .tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+      const tab=t.getAttribute('data-tab');
+      const map={'pending':pending,'adopted':adopted,'rejected':rejected};
+      const empties={'pending':'还没有待审核的提交','adopted':'还没有已采纳的内容','rejected':'没有不采纳的记录'};
+      render(tab,map[tab]||[],empties[tab]);
+    }));
+    render('pending',pending,'还没有待审核的提交');
+    $('#reviewSync').addEventListener('click',()=>{
+      DB.sync(['site_submissions','site_mygames','site_library','site_radio'],()=>{toast('已从服务器刷新');renderReview();});
+    });
+  }
+  function adoptTarget(type){
+    if(type==='小游戏')return '游戏程序页';
+    if(type==='无线电')return '无线电页';
+    if(type==='代码')return '资源库·代码';
+    if(type==='资源')return '资源库';
+    return '资源库·其他';
+  }
+
+  // 站点设置（多人在线，仅超级管理员）
+  function renderSettings(){
+    const cfg=store.get('site_config',{});
+    const mode=cfg.backend==='remote'&&cfg.url?'remote':'local';
+    $('#apane-settings').innerHTML=`<div class="chat-head"><h3>站点设置 · 多人在线</h3><p>把网站部署到一个共用服务器后，在这里填上服务器地址并开启远程，所有设备就会通过它双向同步：别人提交的内容你也能看到，多个人可以同时使用。</p></div>
+      <div class="panel">
+        <div class="field"><label>当前模式</label><div class="hint">${mode==='remote'?'已开启远程同步：数据会推送到服务器并合并拉取。':'本地模式：数据只存在当前浏览器，跨设备不可见。'}</div></div>
+        <div class="field"><label>服务器地址</label><input id="setUrl" placeholder="例如 https://你的服务器/endpoint" value="${esc(cfg.url||'')}"></div>
+        <div class="field"><label>启用远程同步</label>
+          <select id="setMode"><option value="remote" ${mode==='remote'?'selected':''}>开启（推荐，填好地址后）</option><option value="local" ${mode!=='remote'?'selected':''}>关闭（仅本地）</option></select>
+        </div>
+        <div class="row" style="flex-wrap:wrap;gap:10px">
+          <button class="btn" id="setSave">保存设置</button>
+          <button class="btn ghost" id="setTest">测试连接</button>
+        </div>
+        <div class="panel" style="margin-top:12px"><div class="hint">服务器接口约定（GET <code>?key=名称</code> 返回 <code>{data:[...]}</code>；POST 接收 <code>{key,value}</code>）。请让服务器按此实现，否则无法同步。</div></div>
+      </div>`;
+    $('#setSave').addEventListener('click',()=>{
+      const url=$('#setUrl').value.trim();
+      const backend=$('#setMode').value;
+      store.set('site_config',{backend,url});
+      toast('设置已保存');
+    });
+    $('#setTest').addEventListener('click',()=>{
+      const url=$('#setUrl').value.trim();
+      if(!url){toast('请先填写服务器地址');return;}
+      DB.sync(['site_config'],()=>{
+        fetch(url+'?key=ping').then(r=>r.json()).then(j=>{toast('连接成功：'+JSON.stringify(j));}).catch(()=>toast('连接失败：请检查地址或服务器是否允许跨域'));
+      });
+    });
+  }
+
+  // 添加内容（仅超级管理员）：按类目直接添加 + 下载更新版网页
+  function renderAdd(){
+    const cats=['小游戏','无线电','资源','代码','其他'];
+    $('#apane-add').innerHTML=`<div class="chat-head"><h3>添加内容</h3><p>按类目直接添加：小游戏 / 无线电 / 资源 / 代码 / 其他。添加后立即出现在对应页面；点「下载更新版网页」生成包含新内容的文件，重新上传到 GitHub 后，所有访客都能看到。</p></div>
+      <div class="panel">
+        <div class="sg-label">类别（单选打勾）</div>
+        <div class="radios" id="adRadios">
+          ${cats.map((c,i)=>`<button class="ra${i===0?' on':''}" data-ad="${c}"><span class="ck"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>${c}</button>`).join('')}
+        </div>
+        <div class="dropzone" id="adDrop" role="button" tabindex="0" title="点击选择文件，或拖拽文件到这里">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#0f4c81" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M17 8l-5-5-5 5"/><path d="M12 3v12"/></svg>
+          <div class="dz-t">点击选择文件，或把文件拖到这里</div>
+          <div class="dz-s">自动添加到当前选中的类别（文件会嵌入网页文件，建议单个不超过 1MB）</div>
+          <input type="file" id="adFile" hidden>
+        </div>
+        <div class="field" id="adCatField" style="display:none"><label>资源分类（选「资源」时填）</label>
+          <select id="ad-cat">${['无线电','影像','游戏','学习','工具','代码','其他'].map(c=>`<option value="${c}">${c}</option>`).join('')}</select>
+        </div>
+        <div class="field"><label>名称</label><input id="ad-name" placeholder="名称"></div>
+        <div class="field"><label>说明</label><textarea id="ad-desc" rows="2" placeholder="一句话介绍"></textarea></div>
+        <div class="field"><label>链接（可选）</label><input id="ad-link" placeholder="网址或文件路径"></div>
+        <div class="row" style="gap:10px;flex-wrap:wrap">
+          <button class="btn" id="ad-add">添加</button>
+          <button class="btn ghost" id="ad-download">下载更新版网页</button>
+        </div>
+      </div>
+      <div class="adm-sec">当前各分类内容（写进文件 + 本机新增）</div>
+      <div class="panel" id="adList"></div>`;
+    const radios=$$('#adRadios .ra');
+    radios.forEach(r=>r.addEventListener('click',()=>{
+      radios.forEach(x=>x.classList.remove('on'));
+      r.classList.add('on');
+      $('#adCatField').style.display = r.getAttribute('data-ad')==='资源' ? 'block':'none';
+    }));
+    // 写入当前类别（同名覆盖）
+    function upsert(t,item){
+      if(t==='小游戏'){
+        const g=DB.get('site_mygames',[]);
+        const i=g.findIndex(x=>x.name===item.name);
+        if(i>=0)g[i]=item;else g.push(item);
+        DB.set('site_mygames',g);
+      }else if(t==='无线电'){
+        const r=DB.get('site_radio',[]);
+        const i=r.findIndex(x=>x.name===item.name);
+        if(i>=0)r[i]=item;else r.push(item);
+        DB.set('site_radio',r);
+      }else{
+        const cat = t==='代码'?'代码':(t==='资源'?$('#ad-cat').value:'其他');
+        item.cat=cat;
+        const l=DB.get('site_library',[]);
+        const i=l.findIndex(x=>x.name===item.name&&x.cat===cat);
+        if(i>=0)l[i]=item;else l.push(item);
+        DB.set('site_library',l);
+      }
+    }
+    $('#ad-add').addEventListener('click',()=>{
+      const name=$('#ad-name').value.trim();
+      if(!name){toast('请填写名称');return;}
+      const sel=radios.find(r=>r.classList.contains('on'))||radios[0];
+      const t=sel.getAttribute('data-ad');
+      const item={name,desc:$('#ad-desc').value.trim(),link:$('#ad-link').value.trim()};
+      if(t==='无线电')item.author='站长';
+      upsert(t,item);
+      $('#ad-name').value=$('#ad-desc').value=$('#ad-link').value='';
+      renderAdd();toast('已添加：'+name);
+    });
+    // 文件区：点击选择 / 拖拽添加，自动进当前类别列表
+    const dz=$('#adDrop'),fip=$('#adFile');
+    fip.addEventListener('change',()=>{if(fip.files&&fip.files[0])addFileItem(fip.files[0]);fip.value='';});
+    dz.addEventListener('click',()=>fip.click());
+    dz.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();fip.click();}});
+    dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('on');});
+    dz.addEventListener('dragleave',()=>dz.classList.remove('on'));
+    dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('on');if(e.dataTransfer&&e.dataTransfer.files&&e.dataTransfer.files[0])addFileItem(e.dataTransfer.files[0]);});
+    function addFileItem(f){
+      if(f.size>3*1024*1024){toast('文件超过 3MB，嵌入网页会太大，请压缩后重试');return;}
+      const sel=radios.find(r=>r.classList.contains('on'))||radios[0];
+      const t=sel.getAttribute('data-ad');
+      const rd=new FileReader();
+      rd.onload=()=>{
+        const item={name:f.name,desc:'文件 '+fmtSize(f.size)+'（点击下载）',link:rd.result};
+        if(t==='无线电')item.author='站长';
+        upsert(t,item);
+        renderAdd();toast('已添加文件：'+f.name);
+      };
+      rd.readAsDataURL(f);
+    }
+    $('#ad-download').addEventListener('click',downloadUpdated);
+    // 当前内容列表
+    const listHtml=(key,title)=>{const its=getItems(key);if(!its.length)return '';
+      return `<div class="cat-head">${title}<span class="cnt">${its.length}</span></div>`+
+        its.map((it,i)=>`<div class="listrow">
+          <div class="l-b" style="flex:1"><div class="l-t">${esc(it.name)}</div><div class="l-d">${esc(it.desc||'')}</div></div>
+          <button class="l-x" data-ad-del="${key}" data-ad-idx="${i}" aria-label="删除">×</button>
+        </div>`).join('');};
+    $('#adList').innerHTML=listHtml('site_mygames','小游戏（游戏程序页）')+listHtml('site_radio','无线电')+listHtml('site_library','资源库');
+    $$('#adList [data-ad-del]').forEach(b=>b.addEventListener('click',()=>{
+      const key=b.getAttribute('data-ad-del');
+      const idx=+b.getAttribute('data-ad-idx');
+      const its=getItems(key);
+      const item=its[idx];
+      const inInit=INIT_DATA[key]&&INIT_DATA[key].some(x=>x.name===item.name);
+      if(inInit){toast('该条写在网页文件里，请用编辑器删除或告诉我帮你改');return;}
+      const local=store.get(key,[]);
+      local.splice(local.findIndex(x=>x.name===item.name),1);
+      store.set(key,local);
+      renderAdd();toast('已删除（下次下载更新版会生效）');
+    }));
+  }
+  // 下载更新版网页：把当前内容写进文件后下载，重新上传即全员可见
+  function downloadUpdated(){
+    const payload={
+      'site_mygames':getItems('site_mygames'),
+      'site_library':getItems('site_library'),
+      'site_radio':getItems('site_radio')
+    };
+    const json=JSON.stringify(payload).replace(/</g,'\\u003c');
+    fetch(location.href).then(r=>r.text()).then(html=>{
+      const re=/const INIT_DATA=\{[^;]*\};/;
+      if(!re.test(html)){toast('网页源码格式不匹配，无法生成');return;}
+      const next=html.replace(re,'const INIT_DATA='+json+';');
+      const blob=new Blob([next],{type:'text/html'});
+      const a=document.createElement('a');
+      a.href=URL.createObjectURL(blob);
+      a.download='我的网站.html';
+      document.body.appendChild(a);a.click();
+      document.body.removeChild(a);
+      toast('已生成更新版网页文件，请重新上传到 GitHub');
+    }).catch(()=>toast('请在部署后的网址上使用此功能（本地打开无法读取源码）'));
+  }
+  window.addEventListener('hashchange',()=>{if(!$('#adminPanel').classList.contains('show'))return;renderAdminPanes();});
+  // 覆盖 panes 导航时刷新数据
+  $$('.mitem[data-apane]').forEach(b=>b.addEventListener('click',()=>{
+    const p=b.getAttribute('data-apane');
+    if(p==='data'||p==='info')renderAdminPanes();
+    if(p==='admins')renderAdmins();
+  }));
+  // 暴露给全局（登录入口在另一个作用域，需经 window 调用）
+  window.renderAdminPanes=renderAdminPanes;
+  window.renderAdmins=renderAdmins;
+  window.renderReview=renderReview;
+  window.renderSettings=renderSettings;
+  window.renderAdd=renderAdd;
+})();
+</script>
+<script>
+/* ===================== SSTV：编码（Robot 36，图片 → 音频） ===================== */
+const SSTV_SR=88200;
+function initSstvEncode(){
+  const c=$('#encCanvas');
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#ffffff';ctx.fillRect(0,0,320,240);
+  let tool='pencil',color=$('#encColor').value,down=false,lx=0,ly=0;
+
+  function pos(e){
+    const r=c.getBoundingClientRect();
+    return {x:(e.clientX-r.left)*c.width/r.width,y:(e.clientY-r.top)*c.height/r.height};
+  }
+  c.addEventListener('pointerdown',e=>{e.preventDefault();down=true;const p=pos(e);lx=p.x;ly=p.y;drawTo(p.x,p.y);c.setPointerCapture(e.pointerId);});
+  c.addEventListener('pointermove',e=>{if(!down)return;const p=pos(e);drawTo(p.x,p.y);lx=p.x;ly=p.y;});
+  c.addEventListener('pointerup',()=>down=false);
+  c.addEventListener('pointerleave',()=>down=false);
+  function drawTo(x,y){
+    ctx.strokeStyle=tool==='eraser'?'#ffffff':color;
+    ctx.lineWidth=tool==='eraser'?18:3;
+    ctx.lineCap='round';ctx.lineJoin='round';
+    ctx.beginPath();ctx.moveTo(lx,ly);ctx.lineTo(x,y);ctx.stroke();
+  }
+  $$('#encSeg button').forEach(b=>b.addEventListener('click',()=>{
+    tool=b.getAttribute('data-t');
+    $$('#encSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  }));
+  $('#encColor').addEventListener('input',e=>{color=e.target.value;tool='pencil';$$('#encSeg button').forEach(x=>x.classList.toggle('on',x.getAttribute('data-t')==='pencil'));});
+  $('#encClear').addEventListener('click',()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,320,240);});
+  $('#encImg').addEventListener('change',e=>{
+    const f=e.target.files[0];if(!f)return;
+    const img=new Image();
+    img.onload=()=>{
+      ctx.fillStyle='#fff';ctx.fillRect(0,0,320,240);
+      const s=Math.min(320/img.width,240/img.height);
+      const w=img.width*s,h=img.height*s;
+      ctx.drawImage(img,(320-w)/2,(240-h)/2,w,h);
+      toast('图片已载入画布');
+    };
+    img.src=URL.createObjectURL(f);
+    e.target.value='';
+  });
+
+  let lastSamples=null;
+  $('#encGen').addEventListener('click',async()=>{
+    const id=ctx.getImageData(0,0,320,240);
+    const lum=new Float32Array(320*240);
+    for(let i=0;i<320*240;i++){
+      const o=i*4;
+      lum[i]=0.299*id.data[o]+0.587*id.data[o+1]+0.114*id.data[o+2];
+    }
+    $('#encStatus').innerHTML='生成中，请稍候…';
+    $('#encProgress').style.display='block';
+    const {samples}=await genSstvAudio(lum,prog=>{ $('#encProgressBar').style.width=(prog*100)+'%'; });
+    lastSamples=samples;
+    $('#encProgress').style.display='none';
+    $('#encPlay').disabled=false;$('#encDl').disabled=false;
+    $('#encStatus').innerHTML='生成完成（Robot 36，约 '+(samples.length/SSTV_SR).toFixed(1)+' 秒）。可以试听或下载。';
+  });
+
+  async function genSstvAudio(lum,onProg){
+    const SR=SSTV_SR;
+    const headerS=Math.round((0.3+0.01+0.03+7*0.03+0.03+0.3)*SR);
+    const syncN=Math.round(0.009*SR),porchN=Math.round(0.003*SR),pxN=Math.round(0.000532*SR);
+    const lineT=syncN+porchN+320*pxN;
+    const out=new Float32Array(headerS+240*lineT+64);
+    let pos=0,phase=0;
+    function tone(freq,sec){
+      const n=Math.round(sec*SR);
+      const inc=2*Math.PI*freq/SR;
+      for(let i=0;i<n;i++){out[pos+i]=Math.sin(phase);phase+=inc;}
+      pos+=n;
+    }
+    tone(1900,0.3);tone(1200,0.01);
+    tone(1200,0.03);
+    const vis=8;
+    for(let b=0;b<7;b++){tone((vis>>b)&1?1100:1300,0.03);}
+    tone(1200,0.03);
+    tone(1900,0.3);
+    for(let y=0;y<240;y++){
+      phase=0;
+      tone(1200,0.009);tone(1500,0.003);
+      const base=y*320;
+      for(let x=0;x<320;x++){
+        tone(2300 - lum[base+x]*(800/255),0.000532);
+      }
+      const lineTarget=headerS+(y+1)*lineT;
+      if(pos<lineTarget){out.fill(0,pos,lineTarget);pos=lineTarget;}
+      if(y%12===0){onProg((y+1)/240);await new Promise(r=>setTimeout(r,0));}
+    }
+    onProg(1);
+    return {samples:out.subarray(0,pos)};
+  }
+
+  $('#encPlay').addEventListener('click',()=>{
+    if(!lastSamples)return;
+    const ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const buf=ctx.createBuffer(1,lastSamples.length,SSTV_SR);
+    buf.copyToChannel(lastSamples,0);
+    const src=ctx.createBufferSource();src.buffer=buf;src.connect(ctx.destination);src.start();
+  });
+  $('#encDl').addEventListener('click',()=>{
+    if(!lastSamples)return;
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(wavBlob(lastSamples,SSTV_SR));
+    a.download='sstv_robot36.wav';a.click();
+    setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+  });
+}
+function wavBlob(samples,sr){
+  const n=samples.length;
+  const buffer=new ArrayBuffer(44+n*2);
+  const dv=new DataView(buffer);
+  const ws=(o,s)=>{for(let i=0;i<s.length;i++)dv.setUint8(o+i,s.charCodeAt(i));};
+  ws(0,'RIFF');dv.setUint32(4,36+n*2,true);ws(8,'WAVE');ws(12,'fmt ');
+  dv.setUint32(16,16,true);dv.setUint16(20,1,true);dv.setUint16(22,1,true);
+  dv.setUint32(24,sr,true);dv.setUint32(28,sr*2,true);dv.setUint16(32,2,true);dv.setUint16(34,16,true);
+  ws(36,'data');dv.setUint32(40,n*2,true);
+  let o=44;
+  for(let i=0;i<n;i++){const v=Math.max(-1,Math.min(1,samples[i]));dv.setInt16(o,v*32767,true);o+=2;}
+  return new Blob([buffer],{type:'audio/wav'});
+}
+
+/* ===================== SSTV：解码（Robot 36，音频 → 图片） ===================== */
+function initSstvDecode(){
+  const canvas=$('#decCanvas');
+  const dctx=canvas.getContext('2d');
+  const HR=88200;
+  const pxN=Math.round(0.000532*HR),syncN=Math.round(0.009*HR),porchN=Math.round(0.003*HR),lineT=syncN+porchN+320*pxN;
+  const BIT=Math.round(0.03*HR),BRK=Math.round(0.01*HR),CAL=Math.round(0.3*HR);
+  let segs=[],prev=0,lastCross=-1,gi=0,ps=null;
+
+  function setStatus(h){$('#decStatus').innerHTML=h;}
+  function resetSession(){
+    segs=[];prev=0;lastCross=-1;gi=0;
+    ps={mode:'search',ci:0,line:0,imageStart:-1,img:null,finished:false};
+    dctx.fillStyle='#ffffff';dctx.fillRect(0,0,320,240);
+    $('#decProgress').style.display='none';
+    $('#decSave').style.display='none';
+  }
+  function putImg(){ if(ps&&ps.img) dctx.putImageData(ps.img,0,0); }
+  function showProgress(){$('#decProgress').style.display='block';$('#decProgressBar').style.width='0%';}
+  function updateProgress(k){$('#decProgressBar').style.width=Math.round(k*100)+'%';}
+
+  function upsample(arr,sr){
+    if(sr===HR)return arr;
+    const step=sr/HR;
+    const out=new Float64Array(Math.floor(arr.length/step)+2);
+    let oi=0;
+    for(let x=0;x<arr.length-1&&oi<out.length;x+=step){
+      const i0=Math.floor(x),f=x-i0;
+      out[oi++]=arr[i0]*(1-f)+arr[Math.min(arr.length-1,i0+1)]*f;
+    }
+    return out.subarray(0,oi);
+  }
+  function feedSamples(arr,sr){
+    const up=upsample(arr,sr);
+    for(let k=0;k<up.length;k++){
+      const s=up[k],idx=gi+k;
+      if(prev<=0&&s>0){
+        if(lastCross>=0){const period=idx-lastCross;segs.push({s:lastCross,e:idx,f:HR/period});}
+        lastCross=idx;
+      }
+      prev=s;
+    }
+    gi+=up.length;
+    runParse();
+  }
+  function freqAt(k){
+    let lo=0,hi=segs.length-1,b=-1;
+    while(lo<=hi){const m=(lo+hi)>>1;if(segs[m].s<=k){b=m;lo=m+1;}else hi=m-1;}
+    if(b<0||k>=segs[b].e)return 1500;
+    return segs[b].f;
+  }
+  function findLeader(from){
+    let i=from;
+    while(i<segs.length){
+      while(i<segs.length&&!(segs[i].f>=1750&&segs[i].f<=2050))i++;
+      const rs=i;if(i>=segs.length)return null;
+      let j=i,lt=segs[i].e;
+      while(j<segs.length&&segs[j].f>=1750&&segs[j].f<=2050){lt=segs[j].e;j++;}
+      if((lt-segs[rs].s)>=0.15*HR){
+        if(j>=segs.length)return null; // 数据还未结束，等待更多输入
+        return {end:j,tEnd:lt};
+      }
+      i=j;
+    }
+    return null;
+  }
+  function readBit(t0){
+    let i=ps.ci;
+    while(i<segs.length&&segs[i].e<t0)i++;
+    ps.ci=i;
+    let s=0,n=0;
+    while(i<segs.length&&segs[i].e<=t0+BIT){s+=segs[i].f;n++;i++;}
+    ps.ci=i;
+    return n&&s/n<1250?1:0;
+  }
+  function findSyncStart(target){
+    let i=ps.ci;
+    while(i<segs.length&&segs[i].e<target-0.04*HR)i++;
+    while(i<segs.length&&segs[i].e<=target+0.04*HR){
+      if(segs[i].f>=1120&&segs[i].f<=1280){
+        let ok=true;
+        for(let k=1;k<=3;k++){
+          if(i+k<segs.length){const f=segs[i+k].f;if(!(f>=1120&&f<=1280)){ok=false;break;}}
+          else{ok=false;break;}
+        }
+        if(ok)return segs[i].e-Math.round(HR/1200);
+      }
+      i++;
+    }
+    return target;
+  }
+
+  function runParse(){
+    if(!ps||ps.finished)return;
+    if(ps.mode==='search'){
+      const L=findLeader(ps.ci);
+      if(!L)return;
+      ps.ci=L.end;ps.tVis=L.tEnd+BRK;ps.mode='vis';
+    }
+    if(ps.mode==='vis'){
+      const needThrough=ps.tVis+BIT+7*BIT+BIT+CAL;
+      if(!segs.length||segs[segs.length-1].e<needThrough)return;
+      let vis=0;
+      for(let k=0;k<7;k++){if(readBit(ps.tVis+BIT+k*BIT))vis|=(1<<k);}
+      if(vis!==8){
+        setStatus('检测到 SSTV 信号，但 VIS='+vis+'。目前只支持 Robot 36（VIS=8）。');
+        ps.mode='search';return;
+      }
+      ps.imageStart=needThrough;ps.mode='image';ps.line=0;
+      ps.img=dctx.createImageData(320,240);
+      setStatus('已识别 Robot 36（VIS=8），开始解码…');
+      showProgress();
+    }
+    if(ps.mode==='image'){
+      while(ps.line<240){
+        if(!segs.length||segs[segs.length-1].e<ps.imageStart+(ps.line+1)*lineT-40)break;
+        const target=ps.imageStart+ps.line*lineT;
+        const ss=findSyncStart(target);
+        const tPix0=ss+syncN+porchN;
+        const id=ps.img.data;
+        for(let x=0;x<320;x++){
+          const f=freqAt(tPix0+x*pxN+28);
+          let v=(2300-f)/800*255;
+          if(v<0)v=0;if(v>255)v=255;
+          const o=(ps.line*320+x)*4;
+          id[o]=id[o+1]=id[o+2]=v;id[o+3]=255;
+        }
+        ps.line++;
+        updateProgress(ps.line/240);
+        if(ps.line%24===0)putImg();
+      }
+      putImg();
+      if(ps.line>=240){
+        ps.finished=true;
+        $('#decProgressBar').style.width='100%';
+        setStatus('解码完成（Robot 36 · 320×240）。');
+        $('#decSave').style.display='inline-flex';
+      }
+    }
+  }
+
+  // --- 麦克风输入 ---
+  let stream=null,audioCtx=null,scriptNode=null;
+  async function startMic(){
+    resetSession();
+    setStatus('正在请求麦克风权限…');
+    try{stream=await navigator.mediaDevices.getUserMedia({audio:true});}
+    catch(e){setStatus('无法访问麦克风：'+(e.message||'权限被拒绝'));return;}
+    audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const source=audioCtx.createMediaStreamSource(stream);
+    scriptNode=audioCtx.createScriptProcessor(4096,1,1);
+    scriptNode.onaudioprocess=e=>{
+      if(ps&&ps.finished)return;
+      feedSamples(e.inputBuffer.getChannelData(0),audioCtx.sampleRate||48000);
+      if(ps&&ps.finished)stopMic();
+    };
+    const mute=audioCtx.createGain();mute.gain.value=0;
+    source.connect(scriptNode);scriptNode.connect(mute);mute.connect(audioCtx.destination);
+    setStatus('正在收听，请播放 SSTV 音频…');
+  }
+  function stopMic(){
+    if(scriptNode){try{scriptNode.disconnect()}catch(e){}scriptNode=null;}
+    if(stream){stream.getTracks().forEach(t=>t.stop());stream=null;}
+    if(audioCtx){try{audioCtx.close()}catch(e){}audioCtx=null;}
+    if(!(ps&&ps.finished))setStatus('已停止。');
+  }
+
+  // --- 文件输入 ---
+  async function decodeFile(file){
+    resetSession();
+    setStatus('正在解析音频文件…');
+    try{
+      const ab=await file.arrayBuffer();
+      const ctx=new (window.AudioContext||window.webkitAudioContext)();
+      const buf=await ctx.decodeAudioData(ab);
+      setStatus('正在解码，请稍候…');
+      showProgress();
+      const ch=buf.getChannelData(0);
+      setStatus('正在解码，请稍候…');
+      showProgress();
+      const CH=48000;
+      for(let i=0;i<ch.length;i+=CH){
+        feedSamples(ch.subarray(i,i+CH),buf.sampleRate);
+        await new Promise(r=>setTimeout(r,0));
+      }
+      if(ps&&!ps.finished&&ps.mode==='search')setStatus('没有识别到 Robot 36 的 SSTV 信号（检查格式是否为 Robot 36 / VIS=8）。');
+      if(ps&&ps.finished)setStatus('解码完成（Robot 36 · 320×240）。');
+    }catch(err){
+      setStatus('文件解码失败：'+err.message);
+    }
+  }
+
+  $('#decStart').addEventListener('click',()=>{startMic();$('#decStart').disabled=true;$('#decStop').disabled=false;});
+  $('#decStop').addEventListener('click',()=>{stopMic();$('#decStart').disabled=false;$('#decStop').disabled=true;});
+  $('#decFile').addEventListener('change',e=>{
+    const f=e.target.files[0];if(f)decodeFile(f);
+    e.target.value='';
+  });
+  $('#decSave').addEventListener('click',()=>{
+    const a=document.createElement('a');
+    a.href=canvas.toDataURL('image/png');
+    a.download='sstv_decoded.png';a.click();
+  });
+  resetSession();
+}
+</script>
+</body>
+</html>
